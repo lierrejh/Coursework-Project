@@ -1,1 +1,1 @@
-draw_window()
+main_menu
