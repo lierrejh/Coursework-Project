@@ -11,6 +11,9 @@ class Tilesheet:
                 rect = (tile_x * width, tile_y * height, width, height)
                 line.append(image.subsurface(rect))
     
+    def get_tile(self, x , y):
+        return self.tile_table[x][y]
+    
     def draw(self, screen):
         for x, row in enumerate(self.tile_table):
             for y, tile in enumerate(row):
