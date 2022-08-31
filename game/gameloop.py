@@ -80,6 +80,7 @@ class Game:
     def draw_window(self):
         self.screen.fill(self.bg_colour)
         self.player.update()
+        pygame.display.flip()
         # bigger_player = pygame.transform.scale(player, (64,64))
         # self.screen.blit(bigger_player, [400,400])
         # self.tiles.draw(self.screen)
