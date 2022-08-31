@@ -37,7 +37,7 @@ class Game:
         run = True
         while run:
             
-            screen.fill((0,0,0))
+            Game.draw_window(self)
 
             if game_paused == True: #options menu
                 optionsMenu = OptionsMenu(screen)
@@ -59,7 +59,10 @@ class Game:
     
     def draw_window(self):
         self.screen.fill(self.bg_colour)
-        self.screen.blit(self.tiles.get_tile(5, 2) (400, 400))
+        self.screen.blit(self.tiles.get_tile(15, 15), (400, 400))
+        # bigger_player = pygame.transform.scale(player, (64,64))
+        # self.screen.blit(bigger_player, [400,400])
+        # self.tiles.draw(self.screen)
 
     def draw_text(self, text,font, text_colour, x , y):
         img = font.render(text, True, text_colour)

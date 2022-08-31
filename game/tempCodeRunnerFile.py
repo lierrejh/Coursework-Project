@@ -1,1 +1,2 @@
-    screen = pygame.display.set_mode((1600, 1000))
+mainMenu = MainMenu(screen)
+    mainMenu.run()

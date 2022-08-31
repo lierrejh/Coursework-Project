@@ -12,10 +12,10 @@ class Tilesheet:
                 line.append(image.subsurface(rect))
     
     def get_tile(self, x , y):
-        return self.tile_table[x][y]
+        return pygame.transform.scale(self.tile_table[x][y], (64,64))
     
     def draw(self, screen):
         for x, row in enumerate(self.tile_table):
             for y, tile in enumerate(row):
-                screen.blit(tile, (x * 72, y * 72))
+                screen.blit(tile, (x * 50, y * 50))
     

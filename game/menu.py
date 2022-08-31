@@ -80,32 +80,32 @@ class MainMenu:
         pygame.quit()   
         
 class OptionsMenu():
-    def __init__(self, game):
-         def __init__(self, screen):
-            self.width = 1600
-            self.height = 1000
-            self.screen = screen
-            self.state = "main"
+     def __init__(self, screen):
+        self.width = 1600
+        self.height = 1000
+        self.screen = screen
+        self.state = "main"
 
-    def run(self):
+     def run(self):
         
         run = True
         
         while run:
-            bg = pygame.Surface((self.width, self.height))
+            bg = pygame.Surface((self.width,self.height))
             bg.set_alpha(30)
             bg.fill((0,0,0))
             self.screen.blit(bg, (0,0))
 
             if self.state == "main": #menu settings for initial menu
                 if resume_button.draw(self.screen):
+                    from gameloop import Game
                     game = Game(self.screen)
-                    game.run()
-                    del game
+                    game.game_loop(self.screen)
                 if options_button.draw(self.screen):
                     self.state = "options"
                 if quit_button.draw(self.screen):
-                    run = False
+                    mainMenu = MainMenu(self.screen)
+                    mainMenu.run()
             
             elif self.state == "options": #menu settings within options
                 if video_button.draw(self.screen):
@@ -132,6 +132,7 @@ class OptionsMenu():
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     run = False
+                
 
             pygame.display.update()
         
