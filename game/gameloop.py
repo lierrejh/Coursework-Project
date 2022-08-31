@@ -2,6 +2,7 @@ import pygame
 import buttoncontrol
 from menu import OptionsMenu
 from tilesheet import Tilesheet
+from player import Player
 pygame.font.init()
 pygame.init()
 
@@ -28,6 +29,8 @@ class Game:
         self.resumeButton = pygame.image.load("assets/buttons/Resume_Button.png").convert_alpha()
         self.tiles = Tilesheet('assets/sprites+items/0x72_16x16DungeonTileset.v4.png', 16, 16, 16, 16)
         self.screen = screen
+        self.player = Player(self,800,500)
+
 
     
     def game_loop(self, screen):
@@ -49,6 +52,23 @@ class Game:
                         game_paused = False
                     elif (event.key == pygame.K_ESCAPE) and (game_paused == False): #Pause on escape
                         game_paused = True
+                    if event.key == pygame.K_a:
+                        self.player.left_pressed = True
+                    if event.key == pygame.K_d:
+                        self.player.right_pressed = True
+                    if event.key == pygame.K_w:
+                        self.player.up_pressed = True
+                    if event.key == pygame.K_s:
+                        self.player.down_pressed = True
+                elif event.type == pygame.KEYUP:
+                    if event.key == pygame.K_a:
+                        self.player.left_pressed = False
+                    if event.key == pygame.K_d:
+                        self.player.right_pressed = False
+                    if event.key == pygame.K_w:
+                        self.player.up_pressed = False
+                    if event.key == pygame.K_s:
+                        self.player.down_pressed = False
 
                 elif event.type == pygame.QUIT:
                     run = False
@@ -59,7 +79,7 @@ class Game:
     
     def draw_window(self):
         self.screen.fill(self.bg_colour)
-        self.screen.blit(self.tiles.get_tile(15, 15), (400, 400))
+        self.player.update()
         # bigger_player = pygame.transform.scale(player, (64,64))
         # self.screen.blit(bigger_player, [400,400])
         # self.tiles.draw(self.screen)
