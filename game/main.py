@@ -7,4 +7,3 @@ if __name__ == '__main__':
     from menu import MainMenu
     mainMenu = MainMenu(screen)
     mainMenu.run()
-

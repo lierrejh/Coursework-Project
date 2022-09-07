@@ -1,5 +1,4 @@
 import pygame
-
 class Tilesheet:
     def __init__(self, filename, width, height, rows, cols):
         image = pygame.image.load(filename).convert()
@@ -12,7 +11,7 @@ class Tilesheet:
                 line.append(image.subsurface(rect))
     
     def get_tile(self, x , y):
-        return pygame.transform.scale(self.tile_table[x][y], (64,64))
+        return pygame.transform.scale(self.tile_table[x][y], (16,16))
     
     def draw(self, screen):
         for x, row in enumerate(self.tile_table):

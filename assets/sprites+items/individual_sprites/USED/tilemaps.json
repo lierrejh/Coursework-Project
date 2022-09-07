@@ -1,0 +1,68 @@
+{"frames": {
+
+"0x72_16x16DungeonTileset-21.png":
+{
+	"frame": {"x":1,"y":1,"w":16,"h":16},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":16,"h":16},
+	"sourceSize": {"w":16,"h":16}
+},
+"0x72_16x16DungeonTileset-121.png":
+{
+	"frame": {"x":1,"y":19,"w":16,"h":16},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":16,"h":16},
+	"sourceSize": {"w":16,"h":16}
+},
+"0x72_16x16DungeonTileset-122.png":
+{
+	"frame": {"x":1,"y":37,"w":16,"h":16},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":16,"h":16},
+	"sourceSize": {"w":16,"h":16}
+},
+"0x72_16x16DungeonTileset-125.png":
+{
+	"frame": {"x":1,"y":55,"w":16,"h":16},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":16,"h":16},
+	"sourceSize": {"w":16,"h":16}
+},
+"Wall.png":
+{
+	"frame": {"x":1,"y":73,"w":16,"h":16},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":16,"h":16},
+	"sourceSize": {"w":16,"h":16}
+},
+"WallFilling.png":
+{
+	"frame": {"x":1,"y":91,"w":16,"h":16},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":16,"h":16},
+	"sourceSize": {"w":16,"h":16}
+},
+"WallTop.png":
+{
+	"frame": {"x":1,"y":109,"w":16,"h":5},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":0,"y":11,"w":16,"h":5},
+	"sourceSize": {"w":16,"h":16}
+}},
+"meta": {
+	"app": "https://www.codeandweb.com/texturepacker",
+	"version": "1.0",
+	"image": "tilemaps.png",
+	"format": "RGBA8888",
+	"size": {"w":18,"h":115},
+	"scale": "1",
+	"smartupdate": "$TexturePacker:SmartUpdate:710d80efdbca24f697819c48df8d8851:a8a2f62c772840abd72b62a6df57180f:dc30682170cabfe94dcef5a60e876c9c$"
+}
+}
