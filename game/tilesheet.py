@@ -7,7 +7,7 @@ class Tilesheet:
             line = []
             self.tile_table.append(line)
             for tile_y in range(0,rows):
-                rect = (tile_x * width, tile_y * height, width, height)
+                rect = (tile_x * width , tile_y * height , width, height)
                 line.append(image.subsurface(rect))
     
     def get_tile(self, x , y):

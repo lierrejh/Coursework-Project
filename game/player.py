@@ -8,15 +8,18 @@ class Player(pygame.sprite.Sprite):
         self.right_pressed = False
         self.up_pressed = False
         self.down_pressed = False
-        self.speed = 2
-        self.screen = pygame.display.set_mode((1600, 1000))
+        self.speed = 4
         self.image = pygame.image.load('assets/sprites+items/individual_sprites/StartingCharacter.png').convert_alpha()
         self.rect = self.image.get_rect(center = (x, y))
-        self.direction = pygame.math.Vector2()
- 
+        self.direction = pygame.math.Vector2() 
         # self.tiles = Tilesheet('assets/sprites+items/0x72_16x16DungeonTileset.v4.png', 16, 16, 16, 16)
         self.user = pygame.image.load('assets/sprites+items/individual_sprites/StartingCharacter.png').convert_alpha()
+        self.user_flipped = pygame.transform.flip(self.user, True, False)    
         self.left_facing = False
+        self.screen = pygame.display.set_mode((1600, 1000))
+        self.x = x
+        self.y = y
+
 
     def input(self):
         keys = pygame.key.get_pressed()
@@ -30,9 +33,11 @@ class Player(pygame.sprite.Sprite):
 
         if keys[pygame.K_a]:
             self.direction.x = -1
+            self.left_facing = True
         
         elif keys[pygame.K_d]:
             self.direction.x = 1
+            self.left_facing = False
         else:
             self.direction.x = 0
     
@@ -40,11 +45,7 @@ class Player(pygame.sprite.Sprite):
     def update(self):
         self.input()
         self.rect.center += self.direction * self.speed            
-        
-        
-        '''if self.left_facing == False:
-            self.screen.blit(self.user, (int(self.x), int(self.y)))
+        if self.left_facing:
+            self.image = self.user_flipped
         else:
-            flipped_user = pygame.transform.flip(self.user, True, False)    
-            self.screen.blit(flipped_user, (int(self.x), int(self.y)))  '''
-
+            self.image = self.user
