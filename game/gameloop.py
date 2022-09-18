@@ -4,15 +4,18 @@ import buttoncontrol
 from menu import OptionsMenu
 from tilesheet import Tilesheet
 from player import Player
-from tilemap import *
+from tiles import *
 pygame.font.init()
 pygame.init()
-from tilemap import Tilemap
-# Load Spritesheet for level
-tilesheet = Tilesheet('assets/sprites+items/0x72_16x16DungeonTileset.v4.png', 16, 16, 16, 16)
+from tiles import Tilemap
 map = Tilemap('assets/map/MapTest3.csv', tilesheet)
 
-# Game (EVERYTHING SCALED BY 2 (as per line 131))
+
+# Load Spritesheet for level
+tilesheet = Tilesheet('assets/sprites+items/0x72_16x16DungeonTileset.v4.png', 16, 16, 16, 16)
+
+
+# Game (EVERYTHING SCALED BY 2.5X (as per line 131))
 
 class Game:
     
@@ -23,8 +26,15 @@ class Game:
         self.tiles = Tilesheet('assets/sprites+items/0x72_16x16DungeonTileset.v4.png', 16, 16, 16, 16)
         self.screen = screen
         self.display_surface = pygame.display.get_surface()
-        self.camera_group = YSortCamera()
-        self.user = Player(self,768,800, self.camera_group)
+        self.visible_sprites = YSortCamera()
+        # self.obstacle_sprites = pygame.sprite.Group()
+        # self.user = Player(self,1250,1300, [self.visible_sprites], self.obstacle_sprites)
+        self.tile_size = 16
+        # visible_sprites = YSortCamera()
+        # obstacle_sprites = pygame.sprite.Group()
+        self.user = Player(self,1250,1300, self.visible_sprites)
+        self.map = Tilemap('assets/map/MapTest3.csv', tilesheet)
+
 
     def game_loop(self, screen):
          #menu variables
@@ -33,7 +43,7 @@ class Game:
         run = True
         while run:
 
-            Game.draw_window(self)
+            self.draw_window()
             # self.user.add(self.user)
 
 
@@ -51,16 +61,17 @@ class Game:
                     run = False
 
             pygame.display.update()
+            self.clock.tick(60)
 
         pygame.quit()
 
     
     def draw_window(self):
-        self.display_surface.fill(self.bg_colour)
+        self.screen.fill(self.bg_colour)
         # self.tiles.draw(self.screen) for identifying tiles
-        map.draw_map(self.display_surface)
-        self.camera_group.update()
-        self.camera_group.custom_draw(self.user)
+        self.map.draw_map(self.display_surface)
+        self.visible_sprites.update()
+        self.visible_sprites.custom_draw(self.user)
         pygame.display.flip()
 
     '''def draw_text(self, text,font, text_colour, x , y):
@@ -88,9 +99,9 @@ class YSortCamera(pygame.sprite.Group):
     def custom_draw(self, user):    
         self.center_target(user)
         ground_offset = self.ground_rect.topleft - self.offset
-        self.screen.blit(pygame.transform.scale(self.ground_surf, (3200,2000)) , ground_offset)
+        self.screen.blit(pygame.transform.scale(self.ground_surf, (4000,2500)) , ground_offset)
 
         for sprite in sorted(self.sprites(), key = lambda sprite: sprite.rect.centery):
             offset_pos = sprite.rect.topleft - self.offset
-            self.screen.blit(pygame.transform.scale(sprite.image , (50,50)), offset_pos)
+            self.screen.blit(pygame.transform.scale(sprite.image , (60,60)), offset_pos)
            
