@@ -98,9 +98,7 @@ class OptionsMenu():
 
             if self.state == "main": #menu settings for initial menu
                 if resume_button.draw(self.screen):
-                    from gameloop import Game
-                    game = Game(self.screen)
-                    game.game_loop(self.screen)
+                    run = False
                 if options_button.draw(self.screen):
                     self.state = "options"
                 if quit_button.draw(self.screen):
@@ -131,9 +129,7 @@ class OptionsMenu():
            
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
-                    run = False
+                    pygame.quit()  
                 
 
             pygame.display.update()
-        
-        pygame.quit()       

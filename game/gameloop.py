@@ -38,6 +38,7 @@ class Game:
 
     def game_loop(self, screen):
          #menu variables
+        self.screen = screen
         game_paused = False
 
         run = True
@@ -48,8 +49,10 @@ class Game:
 
 
             if game_paused == True: #options menu
-                optionsMenu = OptionsMenu(screen)
+                optionsMenu = OptionsMenu(self.screen)
+                game_paused = False
                 optionsMenu.run()
+                
 
             for event in pygame.event.get():
                 if event.type == pygame.KEYDOWN:
