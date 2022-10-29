@@ -2,7 +2,6 @@
 
 import pygame, csv, os
 from tilesheet import Tilesheet
-from player import Player
 
 tilesheet = Tilesheet('assets/sprites+items/0x72_16x16DungeonTileset.v4.png', 16, 16, 16, 16)
 
@@ -15,7 +14,7 @@ class Tile(pygame.sprite.Sprite):
         self.rect.x, self.rect.y = x,y
 
     def draw(self,surface):
-        surface.blit(self.image, (self.rect.x,self.rect.y))
+        surface.blit(self.image, (self.rect.x, self.rect.y))
 
 class Tilemap(pygame.sprite.Sprite):
     def __init__(self, filename, tilesheet):
@@ -27,16 +26,13 @@ class Tilemap(pygame.sprite.Sprite):
         self.tiles = self.load_tiles(filename)
         self.map_surface = pygame.Surface((self.map_w , self.map_h))
         self.map_surface.set_colorkey((0,0,0))
-        
         self.screen = pygame.display.set_mode((1600, 1000))
-
-
+        
         self.load_map()
 
     def draw_map(self, surface):
         surface.blit(self.map_surface, (0,0))
 
-    
     def load_map(self):
         for tile in self.tiles:
             tile.draw(self.map_surface)
@@ -74,6 +70,7 @@ class Tilemap(pygame.sprite.Sprite):
                 elif tile == '18': #wall
                     tiles.append(Tile('assets/sprites+items/individual_sprites/USED/Wall.png', x * self.tile_size, y * self.tile_size, self.tilesheet))
 
+
                 x += 1
             y += 1
         
@@ -81,5 +78,5 @@ class Tilemap(pygame.sprite.Sprite):
         self.map_w, self.map_h = x * self.tile_size, y * self.tile_size
         return tiles
 
-
+    
    

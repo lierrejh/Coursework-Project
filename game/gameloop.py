@@ -33,8 +33,6 @@ class Game:
         # visible_sprites = YSortCamera()
         # obstacle_sprites = pygame.sprite.Group()
         self.user = Player(self,1250,1300, self.visible_sprites)
-        self.map = Tilemap('assets/map/MapTest3.csv', tilesheet)
-
 
     def game_loop(self, screen):
          #menu variables
@@ -72,16 +70,13 @@ class Game:
     def draw_window(self):
         self.screen.fill(self.bg_colour)
         # self.tiles.draw(self.screen) for identifying tiles
-        self.map.draw_map(self.display_surface)
-        self.visible_sprites.update()
+        map.draw_map(self.display_surface)
+        self.visible_sprites.update(map.tiles)
+        self.user.update(map.tiles)
         self.visible_sprites.custom_draw(self.user)
         pygame.display.flip()
 
-    '''def draw_text(self, text,font, text_colour, x , y):
-        img = font.render(text, True, text_colour)
-        self.screen.blit(img, (x,y))'''
-
-class YSortCamera(pygame.sprite.Group):
+class YSortCamera(pygame.sprite.Group): #Camera system
     def __init__(self):
         super().__init__()
         self.display_surface = pygame.display.get_surface()
