@@ -18,7 +18,7 @@ class Player(pygame.sprite.Sprite): #Character class
         self.speed = 6
         self.image = pygame.image.load('assets/sprites+items/individual_sprites/StartingCharacter.png').convert_alpha()
         self.rect = self.image.get_rect(center = (x,y))
-        self.hitbox = self.rect.copy().inflate(70,70)
+        self.hitbox = self.rect.copy().inflate((-90,-90))
         self.direction = pygame.math.Vector2() 
         # self.tiles = Tilesheet('assets/sprites+items/0x72_16x16DungeonTileset.v4.png', 16, 16, 16, 16)
         self.user = pygame.image.load('assets/sprites+items/individual_sprites/StartingCharacter.png').convert_alpha()
@@ -84,9 +84,9 @@ class Player(pygame.sprite.Sprite): #Character class
     def checkCollisionsX(self, tileWall):
         collisions = self.get_hits(tileWall)
         for tile in collisions:
-            if self.direction.x > 0:
+            if self.direction.x < 0:
                 self.hitbox.right = tile.rect.left
-            elif self.direction.x < 0:
+            elif self.direction.x > 0:
                 self.hitbox.left = tile.rect.right
             self.rect.centerx = self.hitbox.centerx
             self.position.x = self.hitbox.centerx
@@ -94,9 +94,9 @@ class Player(pygame.sprite.Sprite): #Character class
     def checkCollisionsY(self, tileWall):
         collisions = self.get_hits(tileWall)
         for tile in collisions:
-            if self.direction.y > 0:
+            if self.direction.y < 0:
                 self.hitbox.bottom = tile.rect.top
-            elif self.direction.y < 0:
+            elif self.direction.y > 0:
                 self.hitbox.top = tile.rect.bottom
             self.rect.centery = self.hitbox.centery
             self.position.y = self.hitbox.centery
