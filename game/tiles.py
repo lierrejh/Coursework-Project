@@ -46,29 +46,29 @@ class Tilemap(pygame.sprite.Sprite):
             tile.draw(self.map_surface) 
 
     def read_csv(self, filename): #algorithm taken from Pygame Tile Based Game Tutorial: Tilemaps
-        map = []
+        mapList = []
         with open(os.path.join(filename)) as data:
             data = csv.reader(data, delimiter=',')
             for row in data:
-                map.append(list(row))
-        return map
+                mapList.append(list(row))
+        return mapList
 
     def load_tiles(self, filename):
         tiles = []
         tileWall = []
 
-        map = self.read_csv(filename)
+        mapList = self.read_csv(filename)
         x,y = 0,0
-        for row in map:
+        for row in mapList:
             x = 0
             for tile in row:
                 if tile == '0':
                     tiles.append(Tile('assets/sprites+items/individual_sprites/USED/WallTop.png', x * self.tile_size, y * self.tile_size, self.tilesheet))
                 elif tile == '50': #filling 
                     tiles.append(Tile('assets/sprites+items/individual_sprites/USED/WallFilling.png', x * self.tile_size, y * self.tile_size, self.tilesheet))
-                elif tile == '16': #wall 
+                elif (tile == '16') or (tile == '18'): #wall 
                     tiles.append(Tile('assets/sprites+items/individual_sprites/USED/Wall.png', x * self.tile_size, y * self.tile_size, self.tilesheet))
-                    tileWall.append(Tile('assets/sprites+items/individual_sprites/USED/Wall.png', x * self.tile_size, y * self.tile_size, self.tilesheet))
+                    tileWall.append(Tile('assets/sprites+items/individual_sprites/USED/Wall.png', x * self.tile_size * 2.5, y * self.tile_size * 2.5, self.tilesheet))
                 elif tile == '125': #wall skirt
                     tiles.append(Tile('assets/sprites+items/individual_sprites/USED/0x72_16x16DungeonTileset-125.png', x * self.tile_size, y * self.tile_size, self.tilesheet))
          
@@ -78,10 +78,6 @@ class Tilemap(pygame.sprite.Sprite):
                     tiles.append(Tile('assets/sprites+items/individual_sprites/USED/0x72_16x16DungeonTileset-121.png', x * self.tile_size, y * self.tile_size, self.tilesheet))
                 elif tile == '21': #path
                     tiles.append(Tile('assets/sprites+items/individual_sprites/USED/0x72_16x16DungeonTileset-21.png', x * self.tile_size, y * self.tile_size, self.tilesheet))
-                elif tile == '18': #wall
-                    tiles.append(Tile('assets/sprites+items/individual_sprites/USED/Wall.png', x * self.tile_size, y * self.tile_size, self.tilesheet))
-                    tileWall.append(Tile('assets/sprites+items/individual_sprites/USED/Wall.png', x * self.tile_size, y * self.tile_size, self.tilesheet))
-
 
                 x += 1
             y += 1

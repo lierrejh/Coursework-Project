@@ -40,7 +40,7 @@ class Game:
 
         run = True
         while run:
-            #self.dt = clock.tick(60) * .001 * FPS
+            self.dt = clock.tick(60) * .001 * FPS
             self.draw_window()
             # self.user.add(self.user)
 

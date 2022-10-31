@@ -18,7 +18,7 @@ class Player(pygame.sprite.Sprite): #Character class
         self.speed = 6
         self.image = pygame.image.load('assets/sprites+items/individual_sprites/StartingCharacter.png').convert_alpha()
         self.rect = self.image.get_rect(center = (x,y))
-        self.hitbox = self.rect.inflate(0,-25)
+        self.hitbox = self.rect.copy().inflate(100,100)
         self.direction = pygame.math.Vector2() 
         # self.tiles = Tilesheet('assets/sprites+items/0x72_16x16DungeonTileset.v4.png', 16, 16, 16, 16)
         self.user = pygame.image.load('assets/sprites+items/individual_sprites/StartingCharacter.png').convert_alpha()
@@ -27,21 +27,22 @@ class Player(pygame.sprite.Sprite): #Character class
         self.screen = pygame.display.set_mode((1600, 1000))
         self.x = x
         self.y = y
-        self.position, self.velocity = pygame.math.Vector2(self.x,self.y), pygame.math.Vector2(0,0)
+        self.position, self.velocity = pygame.math.Vector2(self.rect.center), pygame.math.Vector2(0,0)
         self.acceleration = pygame.math.Vector2(0,0)
         self.friction = -.12
-        self.dt = clock.tick(60) * .001 * 60
 
 
     def update(self,tileWall):
-        self.horizontal_movement()
-        self.checkCollisionsX(tileWall) #Horizontal collisions
+        '''self.horizontal_movement()
+        self.checkCollisionsX(tileWall)
         self.vertical_movement()
-        self.checkCollisionsY(tileWall) #Vertical collisions
-
+        self.checkCollisionsY(tileWall)'''
+        self.movement()
 
         if self.direction.magnitude() != 0: #Normalising diagonl movement in order to not gain extra acceleartion
             self.direction = self.direction.normalize()
+        
+
         
         self.hitbox.x += self.direction.x * self.speed
         self.hitbox.y += self.direction.y * self.speed
@@ -51,6 +52,23 @@ class Player(pygame.sprite.Sprite): #Character class
             self.image = self.user_flipped
         else:
             self.image = self.user
+
+    def movement(self):
+        keys = pygame.key.get_pressed()
+        if keys[pygame.K_a]:
+            self.direction.x = -1
+            self.left_facing = True
+        elif keys[pygame.K_d]:
+            self.direction.x = 1
+            self.left_facing = False
+        else: 
+            self.direction.x = 0
+        if keys[pygame.K_w]:
+            self.direction.y = -1
+        elif keys[pygame.K_s]:
+            self.direction.y = 1
+        else:
+            self.direction.y = 0
     
     def horizontal_movement(self):
         keys = pygame.key.get_pressed()
@@ -74,6 +92,7 @@ class Player(pygame.sprite.Sprite): #Character class
             self.direction.y = 1
         else:
             self.direction.y = 0
+                
     
     
     def get_hits(self, tileWall):
@@ -89,22 +108,21 @@ class Player(pygame.sprite.Sprite): #Character class
     def checkCollisionsX(self, tileWall):
         #self.rect.x, self.rect.y = tileWall.sprites()[0].rect.x, tileWall.sprites()[0].rect.y
         collisions = self.get_hits(tileWall)
-        print(collisions)
         for tile in collisions:
-            if self.velocity.x > 0: #Left tile
-                self.position.x = tile.rect.left 
-                self.rect.x = self.position.x
-            elif self.velocity.x < 0: #Left tile
-                self.position.x = tile.rect.right 
-                self.rect.x = self.position.x
-       
-
+            if self.direction.x > 0:
+                self.hitbox.right = tile.rect.left
+            elif self.direction.x < 0:
+                self.hitbox.left = tile.rect.right
+            self.rect.centerx = self.hitbox.centerx
+            self.position.x = self.hitbox.centerx
+    
     def checkCollisionsY(self, tileWall):
+        #self.rect.x, self.rect.y = tileWall.sprites()[0].rect.x, tileWall.sprites()[0].rect.y
         collisions = self.get_hits(tileWall)
         for tile in collisions:
-            if self.velocity.y > 0: #Top of a tile
-                self.position.y = tile.rect.bottom 
-                self.rect.y = self.position.y
-            elif self.velocity.y < 0: #Bottom of a tile
-                self.position.y = tile.rect.top 
-                self.rect.y = self.position.y
+            if self.direction.y > 0:
+                self.hitbox.bottom = tile.rect.top
+            elif self.direction.y < 0:
+                self.hitbox.top = tile.rect.bottom
+            self.rect.centery = self.hitbox.centery
+            self.position.y = self.hitbox.centery
