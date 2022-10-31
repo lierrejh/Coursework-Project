@@ -1,4 +1,6 @@
 import pygame
+import json
+
 class Tilesheet:
     def __init__(self, filename, width, height, rows, cols):
         image = pygame.image.load(filename).convert()
@@ -17,4 +19,5 @@ class Tilesheet:
         for x, row in enumerate(self.tile_table):
             for y, tile in enumerate(row):
                 screen.blit(tile, (x * 50, y * 50))
+
     
