@@ -18,7 +18,7 @@ class Player(pygame.sprite.Sprite): #Character class
         self.speed = 6
         self.image = pygame.image.load('assets/sprites+items/individual_sprites/StartingCharacter.png').convert_alpha()
         self.rect = self.image.get_rect(center = (x,y))
-        self.hitbox = self.rect.copy().inflate((-90,-90))
+        self.hitbox = self.rect.copy().inflate((-60,-60))
         self.direction = pygame.math.Vector2() 
         # self.tiles = Tilesheet('assets/sprites+items/0x72_16x16DungeonTileset.v4.png', 16, 16, 16, 16)
         self.user = pygame.image.load('assets/sprites+items/individual_sprites/StartingCharacter.png').convert_alpha()
@@ -36,7 +36,7 @@ class Player(pygame.sprite.Sprite): #Character class
 
         if self.direction.magnitude() != 0: #Normalising diagonl movement in order to not gain extra acceleartion
             self.direction = self.direction.normalize()
-        
+
         #Horizontal movement
         self.position.x += self.direction.x * self.speed
         self.hitbox.centerx = round(self.position.x)
@@ -50,15 +50,17 @@ class Player(pygame.sprite.Sprite): #Character class
         self.rect.centery = self.hitbox.centery
         self.checkCollisionsY(tileWall)
 
-
-        '''self.hitbox.x += self.direction.x * self.speed
-        self.hitbox.y += self.direction.y * self.speed
-        self.rect.center = self.hitbox.center'''
-
         if self.left_facing:
             self.image = self.user_flipped
         else:
             self.image = self.user
+
+
+        color = (250,0,0)
+        for tile in tileWall:
+            largertile = tile.rect.copy().inflate((-5,-5))
+            pygame.draw.rect(
+                self.screen,color, largertile)
         
     def movement(self):
         keys = pygame.key.get_pressed()
@@ -83,11 +85,15 @@ class Player(pygame.sprite.Sprite): #Character class
 
     def checkCollisionsX(self, tileWall):
         collisions = self.get_hits(tileWall)
+        #print(collisions)
+
         for tile in collisions:
+            largertile = tile.rect.copy().inflate((0,0))
+
             if self.direction.x < 0:
-                self.hitbox.right = tile.rect.left
+                self.hitbox.right = largertile.left
             elif self.direction.x > 0:
-                self.hitbox.left = tile.rect.right
+                self.hitbox.left = largertile.right
             self.rect.centerx = self.hitbox.centerx
             self.position.x = self.hitbox.centerx
     
