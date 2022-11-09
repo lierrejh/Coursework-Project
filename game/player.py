@@ -10,29 +10,33 @@ clock = pygame.time.Clock()
 class Player(pygame.sprite.Sprite): #Character class
     def __init__(self, game, x , y, group):#, groups):#, groups)
         super().__init__(group)
+        self.color = (250,0,0)
+        self.screen = pygame.display.set_mode((1600, 1000))
         self.game = game
-        self.left_pressed = False
-        self.right_pressed = False
-        self.up_pressed = False
-        self.down_pressed = False
+        self.left_pressed, self.right_pressed = False, False
         self.speed = 6
         self.image = pygame.image.load('assets/sprites+items/individual_sprites/StartingCharacter.png').convert_alpha()
-        self.rect = self.image.get_rect(center = (x,y))
-        self.hitbox = self.rect.copy().inflate((-60,-60))
+        #self.rect.topleft = (x-16,y+16)
+        #self.rect.topright = (x+16,y+16)
         self.direction = pygame.math.Vector2() 
-        # self.tiles = Tilesheet('assets/sprites+items/0x72_16x16DungeonTileset.v4.png', 16, 16, 16, 16)
-        self.user = pygame.image.load('assets/sprites+items/individual_sprites/StartingCharacter.png').convert_alpha()
-        self.user_flipped = pygame.transform.flip(self.user, True, False)    
+        self.userTile = Tilesheet('assets/sprites+items/0x72_16x16DungeonTileset.v4.png', 16, 16, 16, 16)
+        self.user_flipped = pygame.transform.flip(self.image, True, False)    
         self.left_facing = False
-        self.screen = pygame.display.set_mode((1600, 1000))
         self.x = x
         self.y = y
-        self.position, self.velocity = pygame.math.Vector2(self.rect.center), pygame.math.Vector2(0,0)
-        self.acceleration = pygame.math.Vector2(0,0)
-        self.friction = -.12
+        #self.user = self.screen.blit(self.userTile.get_tile(12, 15), (int(self.x), int(self.y)))
+        self.user = pygame.image.load('assets/sprites+items/individual_sprites/StartingCharacter.png').convert_alpha()
+        self.rect = self.user.get_rect(center = (self.x,self.y))
+        self.position = pygame.math.Vector2(self.rect.center)
+        self.hitbox = self.rect.copy().inflate((10,10))
 
-    def update(self,tileWall):
+    def update(self,tileWall,collisionList):
+        pygame.draw.rect(self.screen, self.color, self.hitbox)
         self.movement()
+
+        '''for tile in tileWall:
+            pygame.draw.rect(
+                self.screen,self.color, tile)'''
 
         if self.direction.magnitude() != 0: #Normalising diagonl movement in order to not gain extra acceleartion
             self.direction = self.direction.normalize()
@@ -41,7 +45,7 @@ class Player(pygame.sprite.Sprite): #Character class
         self.position.x += self.direction.x * self.speed
         self.hitbox.centerx = round(self.position.x)
         self.rect.centerx = self.hitbox.centerx
-        self.checkCollisionsX(tileWall)
+        self.checkCollisionsX(collisionList)
 
         
         #Vertical Movement
@@ -54,13 +58,6 @@ class Player(pygame.sprite.Sprite): #Character class
             self.image = self.user_flipped
         else:
             self.image = self.user
-
-
-        color = (250,0,0)
-        for tile in tileWall:
-            largertile = tile.rect.copy().inflate((-5,-5))
-            pygame.draw.rect(
-                self.screen,color, largertile)
         
     def movement(self):
         keys = pygame.key.get_pressed()
@@ -79,23 +76,22 @@ class Player(pygame.sprite.Sprite): #Character class
         else:
             self.direction.y = 0
     
-    def get_hits(self, tileWall):
-        hits = pygame.sprite.spritecollide(self, tileWall, False)
-        return hits 
+    def get_hits(self, collisionList):
+        hits = pygame.sprite.spritecollide(self, collisionList, False)
+        return hits
 
-    def checkCollisionsX(self, tileWall):
-        collisions = self.get_hits(tileWall)
-        #print(collisions)
-
+    def checkCollisionsX(self, collisionList):
+        collisions = self.get_hits(collisionList)
+        print(collisions)
         for tile in collisions:
-            largertile = tile.rect.copy().inflate((0,0))
-
             if self.direction.x < 0:
-                self.hitbox.right = largertile.left
+                self.rect.right = tile.rect.left
+                self.position.x = self.rect.centerx - 10
             elif self.direction.x > 0:
-                self.hitbox.left = largertile.right
-            self.rect.centerx = self.hitbox.centerx
-            self.position.x = self.hitbox.centerx
+                self.rect.left = tile.rect.right
+                self.position.x = self.rect.centerx - 10
+            #self.rect.centerx = self.hitbox.centerx
+            #self.position.x = self.hitbox.centerx
     
     def checkCollisionsY(self, tileWall):
         collisions = self.get_hits(tileWall)

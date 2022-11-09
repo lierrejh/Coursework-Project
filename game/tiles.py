@@ -32,7 +32,7 @@ class Tilemap(pygame.sprite.Sprite):
         self.tile_size = 16
         self.start_x, self.start_y = 0, 0
         self.tilesheet = tilesheet
-        self.tiles,self.tileWall = self.load_tiles(filename)
+        self.tiles,self.tileWall, self.collisionList = self.load_tiles(filename)
         self.map_surface = pygame.Surface((self.map_w, self.map_h))
         self.map_surface.set_colorkey((0, 0, 0))
         self.load_map()
@@ -56,6 +56,7 @@ class Tilemap(pygame.sprite.Sprite):
     def load_tiles(self, filename):
         tiles = []
         tileWall = []
+        collisionList = []
 
         mapList = self.read_csv(filename)
         x,y = 0,0
@@ -68,7 +69,9 @@ class Tilemap(pygame.sprite.Sprite):
                     tiles.append(Tile('assets/sprites+items/individual_sprites/USED/WallFilling.png', x * self.tile_size, y * self.tile_size, self.tilesheet))
                 elif (tile == '16') or (tile == '18'): #wall 
                     tiles.append(Tile('assets/sprites+items/individual_sprites/USED/Wall.png', x * self.tile_size, y * self.tile_size, self.tilesheet))
-                    tileWall.append(Tile('assets/sprites+items/individual_sprites/USED/Wall.png', x * self.tile_size * 2.5, y * self.tile_size * 2.5, self.tilesheet))
+                    #*2.5
+                    tileWall.append(Tile('assets/sprites+items/individual_sprites/USED/Wall.png', x * self.tile_size , y * self.tile_size , self.tilesheet))
+                    collisionList.append(Tile('assets/sprites+items/individual_sprites/USED/Wall.png', x * self.tile_size * 2.5 , y * self.tile_size * 2.5, self.tilesheet))
                 elif tile == '125': #wall skirt
                     tiles.append(Tile('assets/sprites+items/individual_sprites/USED/0x72_16x16DungeonTileset-125.png', x * self.tile_size, y * self.tile_size, self.tilesheet))
          
@@ -84,8 +87,9 @@ class Tilemap(pygame.sprite.Sprite):
         
                 
         tileWall = pygame.sprite.Group(tileWall)
+        collisionList = pygame.sprite.Group(collisionList)
         self.map_w, self.map_h = x * self.tile_size, y * self.tile_size
-        return tiles, tileWall
+        return tiles, tileWall, collisionList
 
     
    

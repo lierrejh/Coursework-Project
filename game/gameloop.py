@@ -69,7 +69,7 @@ class Game:
         # self.tiles.draw(self.screen) for identifying tiles
         map.draw_map(self.screen)
         #self.visible_sprites.update(map.tileWall)
-        self.user.update(map.tileWall)
+        self.user.update(map.tileWall, map.collisionList)
         self.visible_sprites.custom_draw(self.user)
         pygame.display.flip()
 
