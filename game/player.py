@@ -27,7 +27,7 @@ class Player(pygame.sprite.Sprite): #Character class
         self.user = pygame.image.load('assets/sprites+items/individual_sprites/StartingCharacter.png').convert_alpha()
         self.rect = self.user.get_rect(center = (self.x,self.y))
         self.position = pygame.math.Vector2(self.rect.center)
-        self.hitbox = self.rect.copy().inflate((10,10))
+        self.hitbox = self.rect.copy().inflate((25,50))
 
     def update(self,tileWall,collisionList):
         pygame.draw.rect(self.screen, self.color, self.hitbox)
@@ -44,14 +44,14 @@ class Player(pygame.sprite.Sprite): #Character class
         self.position.x += self.direction.x * self.speed
         self.hitbox.centerx = round(self.position.x)
         self.rect.centerx = self.hitbox.centerx
-        self.checkCollisionsX(collisionList, tileWall)
+        self.checkCollisionsX(collisionList)
 
         
         #Vertical Movement
         self.position.y += self.direction.y * self.speed
         self.hitbox.centery = round(self.position.y)
         self.rect.centery = self.hitbox.centery
-        self.checkCollisionsY(tileWall)
+        self.checkCollisionsY(collisionList)
 
         if self.left_facing:
             self.image = self.user_flipped
@@ -76,36 +76,34 @@ class Player(pygame.sprite.Sprite): #Character class
             self.direction.y = 0
     
     def get_hits(self, collisionList):
-        hits = pygame.sprite.spritecollide(self, collisionList, False)
+        '''hits = pygame.sprite.spritecollide(self, collisionList, False)
+        return hits'''
+        hits = []
+        for tile in collisionList:
+            if self.hitbox.colliderect(tile):
+                hits.append(tile)
         return hits
 
-    def checkCollisionsX(self, collisionList, tileWall):
+    def checkCollisionsX(self, collisionList):
         collisions = self.get_hits(collisionList)
         print(collisions)
-        '''for tile in collisions:
-            if self.direction.x < 0:
-                self.rect.right = tile.rect.left
-                self.position.x = self.rect.centerx - 10
-            elif self.direction.x > 0:
-                self.rect.left = tile.rect.right
-                self.position.x = self.rect.centerx - 10'''
-            #self.rect.centerx = self.hitbox.centerx
-            #self.position.x = self.hitbox.centerx'''
-        for tile in tileWall:
-            if self.direction.x < 0:
-                self.rect.right = tile.rect.left
-                self.position.x = self.rect.centerx - 10
-            elif self.direction.x > 0:
-                self.rect.left = tile.rect.right
-                self.position.x = self.rect.centerx - 10
+        for tile in collisions:
+            if self.direction.x > 0: #Moving right
+                self.hitbox.right = tile.rect.left
+                self.position.x = self.rect.centerx
+            elif self.direction.x < 0: #Moving left
+                self.hitbox.left = tile.rect.right
+                self.position.x = self.rect.centerx
+            self.rect.centerx = self.hitbox.centerx
+            self.position.x = self.hitbox.centerx
 
     
-    def checkCollisionsY(self, tileWall):
-        collisions = self.get_hits(tileWall)
+    def checkCollisionsY(self, collisionList):
+        collisions = self.get_hits(collisionList)
         for tile in collisions:
-            if self.direction.y < 0:
+            if self.direction.y > 0:
                 self.hitbox.bottom = tile.rect.top
-            elif self.direction.y > 0:
+            elif self.direction.y < 0:
                 self.hitbox.top = tile.rect.bottom
             self.rect.centery = self.hitbox.centery
             self.position.y = self.hitbox.centery
