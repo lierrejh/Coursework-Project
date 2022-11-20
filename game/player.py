@@ -30,13 +30,12 @@ class Player(pygame.sprite.Sprite): #Character class
         self.hitbox = self.rect.copy().inflate((25,50))
 
     def update(self,tileWall,collisionList):
-        pygame.draw.rect(self.screen, self.color, self.hitbox)
         self.movement()
 
-        for tile in tileWall:
+        '''for tile in tileWall:
             pygame.draw.rect(
-                self.screen,self.color, tile)
-
+                self.screen,self.color, tile)'''
+        
         '''if self.direction.magnitude() != 0: #Normalising diagonl movement in order to not gain extra acceleartion
             self.direction = self.direction.normalize()'''
 
@@ -86,7 +85,6 @@ class Player(pygame.sprite.Sprite): #Character class
 
     def checkCollisionsX(self, collisionList):
         collisions = self.get_hits(collisionList)
-        print(collisions)
         for tile in collisions:
             if self.direction.x > 0: #Moving right
                 self.hitbox.right = tile.rect.left
@@ -95,7 +93,7 @@ class Player(pygame.sprite.Sprite): #Character class
                 self.hitbox.left = tile.rect.right
                 self.position.x = self.rect.centerx
             self.rect.centerx = self.hitbox.centerx
-            self.position.x = self.hitbox.centerx
+            self.position.x = self.rect.centerx
 
     
     def checkCollisionsY(self, collisionList):
