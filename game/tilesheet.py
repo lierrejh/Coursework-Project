@@ -13,7 +13,8 @@ class Tilesheet:
                 line.append(image.subsurface(rect))
     
     def get_tile(self, x , y):
-        return pygame.transform.scale(self.tile_table[x][y], (16,16))
+        tileNeeded = pygame.transform.scale(self.tile_table[x][y], (16,16))
+        return tileNeeded
     
     def draw(self, screen):
         for x, row in enumerate(self.tile_table):

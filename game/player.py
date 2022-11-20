@@ -14,17 +14,16 @@ class Player(pygame.sprite.Sprite): #Character class
         self.screen = pygame.display.set_mode((1600, 1000))
         self.game = game
         self.left_pressed, self.right_pressed = False, False
-        self.speed = 6
+        self.speed = 4
+        #self.image = pygame.image.load('assets/sprites+items/individual_sprites/0x72_16x16DungeonTileset-245.png').convert_alpha()
         self.image = pygame.image.load('assets/sprites+items/individual_sprites/StartingCharacter.png').convert_alpha()
-        #self.rect.topleft = (x-16,y+16)
-        #self.rect.topright = (x+16,y+16)
         self.direction = pygame.math.Vector2() 
         self.userTile = Tilesheet('assets/sprites+items/0x72_16x16DungeonTileset.v4.png', 16, 16, 16, 16)
         self.user_flipped = pygame.transform.flip(self.image, True, False)    
         self.left_facing = False
         self.x = x
         self.y = y
-        #self.user = self.screen.blit(self.userTile.get_tile(12, 15), (int(self.x), int(self.y)))
+        #self.user = self.userTile.get_tile(15, 15), (400,400)
         self.user = pygame.image.load('assets/sprites+items/individual_sprites/StartingCharacter.png').convert_alpha()
         self.rect = self.user.get_rect(center = (self.x,self.y))
         self.position = pygame.math.Vector2(self.rect.center)
@@ -34,18 +33,18 @@ class Player(pygame.sprite.Sprite): #Character class
         pygame.draw.rect(self.screen, self.color, self.hitbox)
         self.movement()
 
-        '''for tile in tileWall:
+        for tile in tileWall:
             pygame.draw.rect(
-                self.screen,self.color, tile)'''
+                self.screen,self.color, tile)
 
-        if self.direction.magnitude() != 0: #Normalising diagonl movement in order to not gain extra acceleartion
-            self.direction = self.direction.normalize()
+        '''if self.direction.magnitude() != 0: #Normalising diagonl movement in order to not gain extra acceleartion
+            self.direction = self.direction.normalize()'''
 
         #Horizontal movement
         self.position.x += self.direction.x * self.speed
         self.hitbox.centerx = round(self.position.x)
         self.rect.centerx = self.hitbox.centerx
-        self.checkCollisionsX(collisionList)
+        self.checkCollisionsX(collisionList, tileWall)
 
         
         #Vertical Movement
@@ -80,18 +79,26 @@ class Player(pygame.sprite.Sprite): #Character class
         hits = pygame.sprite.spritecollide(self, collisionList, False)
         return hits
 
-    def checkCollisionsX(self, collisionList):
+    def checkCollisionsX(self, collisionList, tileWall):
         collisions = self.get_hits(collisionList)
         print(collisions)
-        for tile in collisions:
+        '''for tile in collisions:
+            if self.direction.x < 0:
+                self.rect.right = tile.rect.left
+                self.position.x = self.rect.centerx - 10
+            elif self.direction.x > 0:
+                self.rect.left = tile.rect.right
+                self.position.x = self.rect.centerx - 10'''
+            #self.rect.centerx = self.hitbox.centerx
+            #self.position.x = self.hitbox.centerx'''
+        for tile in tileWall:
             if self.direction.x < 0:
                 self.rect.right = tile.rect.left
                 self.position.x = self.rect.centerx - 10
             elif self.direction.x > 0:
                 self.rect.left = tile.rect.right
                 self.position.x = self.rect.centerx - 10
-            #self.rect.centerx = self.hitbox.centerx
-            #self.position.x = self.hitbox.centerx
+
     
     def checkCollisionsY(self, tileWall):
         collisions = self.get_hits(tileWall)
