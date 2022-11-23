@@ -1,7 +1,6 @@
 import pygame 
 from tilesheet import Tilesheet
 from tiles import *
-from ui import UI
 
 
 tilesheet = Tilesheet('assets/sprites+items/0x72_16x16DungeonTileset.v4.png', 16, 16, 16, 16)
@@ -36,17 +35,15 @@ class Player(pygame.sprite.Sprite): #Character class
         #Health System
         self.current_health = 1000
         self.maximum_health = 1000
-        self.health_bar_length = 400
+        self.health_bar_length = 600
         self.health_ratio = self.maximum_health / self.health_bar_length
         self.target_health = 500
         self.health_change_speed = 5
 
         #UI Sysem
-        self.UI = UI()
+
 
     def update(self,tileWall,collisionList):
-        #self.advanced_health_bar()
-
         self.movement()
 
         '''for tile in tileWall:
@@ -99,12 +96,16 @@ class Player(pygame.sprite.Sprite): #Character class
             transition_width = int((self.target_health - self.current_health) /self.health_ratio)
             transition_color = (255, 255, 0)   
 
-        health_bar_rect = pygame.Rect(10,45,self.current_health/self.health_ratio, 25)
+        health_bar_rect = pygame.Rect(50,45,self.current_health/self.health_ratio, 25)
         transition_bar_rect = pygame.Rect(health_bar_rect.right, 45, transition_width, 25)
 
         pygame.draw.rect(self.display_surface, (255, 0, 0) , health_bar_rect)
         pygame.draw.rect(self.display_surface, transition_color, transition_bar_rect)
-        pygame.draw.rect(self.display_surface,(255,255,255),(10,45,self.health_bar_length,25),4)
+        pygame.draw.rect(self.display_surface,(255,255,255),(50,45,self.health_bar_length,25),4)
+
+    def display_PlayerUI(self, player):
+        self.advanced_health_bar()
+        #pygame.draw.rect(self.display_surface, (255,255,255), self.health_bar_rect)
 
 
     def movement(self):
