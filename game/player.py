@@ -1,6 +1,8 @@
 import pygame 
 from tilesheet import Tilesheet
 from tiles import *
+from ui import UI
+
 
 tilesheet = Tilesheet('assets/sprites+items/0x72_16x16DungeonTileset.v4.png', 16, 16, 16, 16)
 map = Tilemap('assets/map/MapTest3.csv', tilesheet)
@@ -28,8 +30,23 @@ class Player(pygame.sprite.Sprite): #Character class
         self.rect = self.user.get_rect(center = (self.x,self.y))
         self.position = pygame.math.Vector2(self.rect.center)
         self.hitbox = self.rect.copy().inflate((25,50))
+        self.display_surface = pygame.display.get_surface()
+
+        
+        #Health System
+        self.current_health = 1000
+        self.maximum_health = 1000
+        self.health_bar_length = 400
+        self.health_ratio = self.maximum_health / self.health_bar_length
+        self.target_health = 500
+        self.health_change_speed = 5
+
+        #UI Sysem
+        self.UI = UI()
 
     def update(self,tileWall,collisionList):
+        #self.advanced_health_bar()
+
         self.movement()
 
         '''for tile in tileWall:
@@ -57,6 +74,39 @@ class Player(pygame.sprite.Sprite): #Character class
         else:
             self.image = self.user
         
+    def get_damage(self, amount):
+        if self.target_health > 0:
+            self.target_health -= amount
+        if self.target_health < 0:
+            self.target_health = 0
+
+    def get_health(self, amount):
+        if self.target_health < self.maximum_health:
+            self.target_health += amount
+        if self.target_health > self.maximum_health:
+            self.target_health = self.maximum_health
+    
+    def advanced_health_bar(self):
+        transition_width = 0
+        transition_color = (255,0,0)
+
+        if self.current_health < self.target_health:
+            self.current_health += self.health_change_speed
+            transition_width = int((self.target_health - self.current_health)/self.health_ratio)
+            transition_color = (0,255,0)
+        if self.current_health > self.target_health:
+            self.current_health -= self.health_change_speed
+            transition_width = int((self.target_health - self.current_health) /self.health_ratio)
+            transition_color = (255, 255, 0)   
+
+        health_bar_rect = pygame.Rect(10,45,self.current_health/self.health_ratio, 25)
+        transition_bar_rect = pygame.Rect(health_bar_rect.right, 45, transition_width, 25)
+
+        pygame.draw.rect(self.display_surface, (255, 0, 0) , health_bar_rect)
+        pygame.draw.rect(self.display_surface, transition_color, transition_bar_rect)
+        pygame.draw.rect(self.display_surface,(255,255,255),(10,45,self.health_bar_length,25),4)
+
+
     def movement(self):
         keys = pygame.key.get_pressed()
         if keys[pygame.K_a]:
@@ -69,8 +119,10 @@ class Player(pygame.sprite.Sprite): #Character class
             self.direction.x = 0
         if keys[pygame.K_w]:
             self.direction.y = -1
+            self.get_health(100)
         elif keys[pygame.K_s]:
             self.direction.y = 1
+            self.get_damage(100)
         else:
             self.direction.y = 0
     

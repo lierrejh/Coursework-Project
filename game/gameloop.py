@@ -5,6 +5,7 @@ from menu import OptionsMenu
 from tilesheet import Tilesheet
 from player import Player
 from tiles import *
+from ui import UI
 pygame.font.init()
 pygame.init()
 map = Tilemap('assets/map/MapTest3.csv', tilesheet)
@@ -25,12 +26,14 @@ class Game:
         self.tiles = Tilesheet('assets/sprites+items/0x72_16x16DungeonTileset.v4.png', 16, 16, 16, 16)
         self.screen = screen
         self.visible_sprites = YSortCamera()
+        self.UI = UI()
         # self.obstacle_sprites = pygame.sprite.Group()
         # self.user = Player(self,1250,1300, [self.visible_sprites], self.obstacle_sprites)
         self.tile_size = 16
         # visible_sprites = YSortCamera()
         # obstacle_sprites = pygame.sprite.Group()
         self.user = Player(self,1250,1300, self.visible_sprites)
+
 
 
     def game_loop(self, screen):
@@ -71,6 +74,7 @@ class Game:
         #self.visible_sprites.update(map.tileWall)
         self.user.update(map.tileWall, map.collisionList)
         self.visible_sprites.custom_draw(self.user)
+        self.UI.display(self.user)
         pygame.display.flip()
 
 class YSortCamera(pygame.sprite.Group): #Camera system
