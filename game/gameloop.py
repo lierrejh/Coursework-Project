@@ -5,6 +5,7 @@ from menu import OptionsMenu
 from tilesheet import Tilesheet
 from player import Player
 from tiles import *
+from ui import UI
 
 pygame.font.init()
 pygame.init()
@@ -32,32 +33,35 @@ class Game:
         # visible_sprites = YSortCamera()
         # obstacle_sprites = pygame.sprite.Group()
         self.user = Player(self,1250,1300, self.visible_sprites)
+        self.UI = UI()
 
 
 
     def game_loop(self, screen):
-         #menu variables
+        #menu variables
         self.screen = screen
         game_paused = False
 
         run = True
+        wave = 0
         while run:
             self.dt = clock.tick(60) * .001 * FPS
-            self.draw_window()
-            # self.user.add(self.user)
+            self.draw_window(wave) #passes wave into UI - make wave system with enemies
 
             if game_paused == True: #options menu
                 optionsMenu = OptionsMenu(self.screen)
                 game_paused = False
                 optionsMenu.run()
                 
-
+            keys = pygame.key.get_pressed()
             for event in pygame.event.get():
                 if event.type == pygame.KEYDOWN:
                     if (event.key == pygame.K_ESCAPE) and (game_paused == True): #Unpause on escape if game is paused
                         game_paused = False
                     elif (event.key == pygame.K_ESCAPE) and (game_paused == False): #Pause on escape
                         game_paused = True
+                    elif keys[pygame.K_f]:#testing wave system / remove later
+                        wave += 1
                 elif event.type == pygame.QUIT:
                     run = False
 
@@ -66,7 +70,7 @@ class Game:
         pygame.quit()
 
     
-    def draw_window(self):
+    def draw_window(self, wave):
         self.screen.fill(self.bg_colour)
         # self.tiles.draw(self.screen) for identifying tiles
         map.draw_map(self.screen)
@@ -74,6 +78,7 @@ class Game:
         self.user.update(map.tileWall, map.collisionList)
         self.visible_sprites.custom_draw(self.user)
         self.user.display_PlayerUI(self.user)
+        self.UI.display(self.user, wave)
         pygame.display.flip()
 
 class YSortCamera(pygame.sprite.Group): #Camera system
