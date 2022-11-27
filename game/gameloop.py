@@ -6,6 +6,7 @@ from tilesheet import Tilesheet
 from player import Player
 from tiles import *
 from ui import UI
+from attack import Weapon
 
 pygame.font.init()
 pygame.init()
@@ -16,7 +17,7 @@ clock = pygame.time.Clock()
 # Load Spritesheet for level
 tilesheet = Tilesheet('assets/sprites+items/0x72_16x16DungeonTileset.v4.png', 16, 16, 16, 16)
 
-# Game (EVERYTHING SCALED BY 2.5X (as per line 131))
+# Game (EVERYTHING SCALED BY 2.5X (as per custom_draw))
 
 class Game:
     
@@ -32,9 +33,9 @@ class Game:
         self.tile_size = 16
         # visible_sprites = YSortCamera()
         # obstacle_sprites = pygame.sprite.Group()
-        self.user = Player(self,1250,1300, self.visible_sprites)
+        self.user = Player(self,1250,1300, self.visible_sprites, self.create_attack, self.remove_attack)
         self.UI = UI()
-
+        self.current_attack = None
 
 
     def game_loop(self, screen):
@@ -53,14 +54,14 @@ class Game:
                 game_paused = False
                 optionsMenu.run()
                 
-            keys = pygame.key.get_pressed()
+            keys = pygame.key.get_pressed() #testing wave system
             for event in pygame.event.get():
                 if event.type == pygame.KEYDOWN:
                     if (event.key == pygame.K_ESCAPE) and (game_paused == True): #Unpause on escape if game is paused
                         game_paused = False
                     elif (event.key == pygame.K_ESCAPE) and (game_paused == False): #Pause on escape
                         game_paused = True
-                    elif keys[pygame.K_f]:#testing wave system / remove later
+                    elif keys[pygame.K_f]: #testing wave system / remove later
                         wave += 1
                 elif event.type == pygame.QUIT:
                     run = False
@@ -69,6 +70,13 @@ class Game:
 
         pygame.quit()
 
+    def create_attack(self):
+        self.current_attack = Weapon(self.user,self.visible_sprites)
+
+    def remove_attack(self):
+        if self.current_attack:
+            self.current_attack.kill()
+        self.current_attack = None
     
     def draw_window(self, wave):
         self.screen.fill(self.bg_colour)
@@ -102,11 +110,12 @@ class YSortCamera(pygame.sprite.Group): #Camera system
     def custom_draw(self, user):    
         self.center_target(user)
         ground_offset = self.ground_rect.topleft - self.offset
-        self.screen.blit(pygame.transform.scale(self.ground_surf, (4000,2500)) , ground_offset)
+        self.screen.blit(pygame.transform.scale(self.ground_surf, (4000,2500)) , ground_offset) # scale from 1600x1000 to 4000x2500
 
         for sprite in sorted(self.sprites(), key = lambda sprite: sprite.rect.centery):
             offset_pos = sprite.rect.topleft - self.offset
-            self.screen.blit(pygame.transform.scale(sprite.image , (60,60)), offset_pos)
+            self.screen.blit(pygame.transform.scale(sprite.image , (50,50)), offset_pos)
+            #self.screen.blit(sprite.image , offset_pos)
  
 
 

@@ -91,9 +91,8 @@ class OptionsMenu():
         run = True
         
         while run:
-            bg = pygame.Surface((self.width,self.height))
-            bg.set_alpha(30)
-            bg.fill((0,0,0))
+            bg = pygame.Surface((self.width,self.height)).convert_alpha()
+            bg.fill([0,0,0,0])
             self.screen.blit(bg, (0,0))
 
             if self.state == "main": #menu settings for initial menu
