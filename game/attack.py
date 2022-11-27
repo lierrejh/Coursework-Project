@@ -16,7 +16,7 @@ class Weapon(pygame.sprite.Sprite):
         elif (direction == (0,1)): # down
             self.rect = self.image.get_rect(midtop = player.hitbox.midbottom + pygame.math.Vector2(-6, -6))
         elif (direction == (0,-1)): # up
-            self.rect = self.image.get_rect(midbottom = player.hitbox.midtop + pygame.math.Vector2(-6, -18))
+            self.rect = self.image.get_rect(midbottom = player.hitbox.midtop + pygame.math.Vector2(-6, -12))
         elif (direction == (1,0)): # right
             self.rect = self.image.get_rect(midleft = player.hitbox.midright + pygame.math.Vector2(5, -12))
         elif (direction == (-1,0)): # left
