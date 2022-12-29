@@ -12,6 +12,9 @@ pygame.font.init()
 pygame.init()
 map = Tilemap('assets/map/MapTest3.csv', tilesheet)
 FPS = 60
+
+# Is this initialised properly? When exactly does this get called,
+# when the object is created?
 clock = pygame.time.Clock()
 
 # Load Spritesheet for level
@@ -46,6 +49,8 @@ class Game:
         run = True
         wave = 0
         while run:
+            # Continuining discussion from the top - should we be using the clock variable,
+            # or instead using the Game object's clock? i.e. self.clock
             self.dt = clock.tick(60) * .001 * FPS
             self.draw_window(wave) #passes wave into UI - make wave system with enemies
 
@@ -57,6 +62,7 @@ class Game:
             keys = pygame.key.get_pressed() #testing wave system
             for event in pygame.event.get():
                 if event.type == pygame.KEYDOWN:
+                    # Remove those == True/False statements 
                     if (event.key == pygame.K_ESCAPE) and (game_paused == True): #Unpause on escape if game is paused
                         game_paused = False
                     elif (event.key == pygame.K_ESCAPE) and (game_paused == False): #Pause on escape
@@ -100,6 +106,7 @@ class YSortCamera(pygame.sprite.Group): #Camera system
         self.offset = pygame.math.Vector2()
         self.ground_surf = self.screen
 
+        # Would it be better for this to be a method instead of storing 2 variables?
         self.ground_rect = self.ground_surf.get_rect(topleft = (0,0))    
     
     def center_target(self, target):
@@ -112,6 +119,7 @@ class YSortCamera(pygame.sprite.Group): #Camera system
         ground_offset = self.ground_rect.topleft - self.offset
         self.screen.blit(pygame.transform.scale(self.ground_surf, (4000,2500)) , ground_offset) # scale from 1600x1000 to 4000x2500
 
+        # There doesn't seem to be a .sprites member
         for sprite in sorted(self.sprites(), key = lambda sprite: sprite.rect.centery):
             offset_pos = sprite.rect.topleft - self.offset
             self.screen.blit(pygame.transform.scale(sprite.image , (50,50)), offset_pos)
