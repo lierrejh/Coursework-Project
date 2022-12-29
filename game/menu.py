@@ -3,6 +3,7 @@ import pygame
 import os
 import buttoncontrol
 
+# Snake cases?
 startButton = pygame.image.load("assets/buttons/Start_Button.png").convert_alpha()
 videoSettings = pygame.image.load("assets/buttons/Video_Settings.png").convert_alpha()
 backButton = pygame.image.load("assets/buttons/Back_Button.png").convert_alpha()
@@ -25,10 +26,12 @@ resume_button = (buttoncontrol.Button(575, 15, resumeButton, 0.8))
 
 class MainMenu:
     def __init__(self, screen):
+        # Pass in parameters, use default parameters instead?
         self.width = 1600
         self.height = 1000
         self.bg = pygame.image.load("assets/mainmenu/background.jpg")
         self.screen = screen
+        # Could an enum be better here? 
         self.state = "main"
 
     def run(self):
@@ -38,8 +41,13 @@ class MainMenu:
         while run:
             self.screen.blit(self.bg, (0,0))
 
+            # I would consider switch/case statements here
+            # (if you're using Python 3.10+)
+
+            # Personally I think inline comments are bad practice
             if self.state == "main": #menu settings for initial menu
                 if start_button.draw(self.screen):
+                    # Imports at the top
                     from gameloop import Game
                     game = Game(self.screen)
                     game.game_loop(self.screen)
@@ -49,7 +57,11 @@ class MainMenu:
                 if quit_button.draw(self.screen):
                     run = False
             
+            # These inline comments are also unnecessary, it's
+            # clear that it's the for the menu options
             elif self.state == "options": #menu settings within options
+
+                # Again, enums
                 if video_button.draw(self.screen):
                     self.state = "video_settings"
                 if audio_button.draw(self.screen):
@@ -71,6 +83,13 @@ class MainMenu:
                 if back_button.draw(self.screen):
                     self.state = "options"
            
+            # Could you get out of this loop early by using "break"
+            # after QUIT is found?
+            # Could you even just break out of this function?
+            # Remove the "run" variable, the loop is now "while True:"
+            # Then when you hit this condition...
+            # if event.type...:
+            #     pygame.quit()
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     run = False
@@ -80,6 +99,8 @@ class MainMenu:
         pygame.quit()   
         
 class OptionsMenu():
+
+    # Again, full parameters with default values
      def __init__(self, screen):
         self.width = 1600
         self.height = 1000
@@ -88,6 +109,7 @@ class OptionsMenu():
 
      def run(self):
         
+        # Like above - could you remove the "run" variable?
         run = True
         
         while run:
@@ -95,6 +117,7 @@ class OptionsMenu():
             bg.fill([0,0,0,0])
             self.screen.blit(bg, (0,0))
 
+            # Same points as above r.e. switch/case and enums
             if self.state == "main": #menu settings for initial menu
                 if resume_button.draw(self.screen):
                     run = False
