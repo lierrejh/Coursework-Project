@@ -10,6 +10,7 @@ class Weapon(pygame.sprite.Sprite):
         path = f"assets/sprites+items/weapons/{player.weapon}.png"
         self.image = pygame.image.load(path).convert_alpha()
 
+        # switch/case statements
         # placement
         if direction == (-1,-1):
             self.rect = self.image.get_rect(midright = player.hitbox.midleft + pygame.math.Vector2(-20, -12))
