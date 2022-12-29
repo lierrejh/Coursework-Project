@@ -3,18 +3,28 @@ from tilesheet import Tilesheet
 from tiles import *
 from settings import *
 
-
+# Are these constants?
+# If so, I think good practice is to use caps, i.e.:
+# TILESHEET = ...
+# MAP = ...
 tilesheet = Tilesheet('assets/sprites+items/0x72_16x16DungeonTileset.v4.png', 16, 16, 16, 16)
 map = Tilemap('assets/map/MapTest3.csv', tilesheet)
+
+# Is this unused?
 clock = pygame.time.Clock()
 
-
+# Comments above. I'd suggest using docstrings for proper documentation too.
+# Also maybe check out naming conventions for private/public variables. Underscores?
 class Player(pygame.sprite.Sprite): # Character class
+    # Extra and default parameters where necessary
     def __init__(self, game, x , y, group, create_attack, remove_attack): # Organise init
         super().__init__(group)
         self.color = (250,0,0)
+        # If 1600/1000 is a constant, then use constants at the top of the file (caps too)
+        # These are magic numbers, need to clean up the repo in the relevant places
         self.screen = pygame.display.set_mode((1600, 1000))
         self.game = game
+        # I think it's better to have these on separate lines
         self.left_pressed, self.right_pressed = False, False
         self.speed = 4
         #self.image = pygame.image.load('assets/sprites+items/individual_sprites/0x72_16x16DungeonTileset-245.png').convert_alpha()
@@ -85,12 +95,16 @@ class Player(pygame.sprite.Sprite): # Character class
             self.image = self.user
         
     def get_damage(self, amount):
+        # Personal preference, maybe:
+        # self.target_health = max(self.target_health - amount, 0)
+        # Might be easier to understand, not sure
         if self.target_health > 0:
             self.target_health -= amount
         if self.target_health <= 0:
             self.target_health = 0
 
     def get_health(self, amount):
+        # Same idea as get_damage
         if self.target_health < self.maximum_health:
             self.target_health += amount
         if self.target_health >= self.maximum_health:
@@ -100,6 +114,7 @@ class Player(pygame.sprite.Sprite): # Character class
         transition_width = 0
         transition_color = (100,0,0)
 
+        # I think this needs some commenting, i.e. why you're doing this
         if self.current_health < self.target_health:
             self.current_health += self.health_change_speed
             transition_width = int((self.target_health - self.current_health)/self.health_ratio)
@@ -147,6 +162,7 @@ class Player(pygame.sprite.Sprite): # Character class
                 hits.append(tile)
         return hits
 
+    # Function naming standards, snake case
     def checkCollisionsX(self, collisionList):
         collisions = self.get_hits(collisionList)
         for tile in collisions:
@@ -172,6 +188,11 @@ class Player(pygame.sprite.Sprite): # Character class
 
     def attack_inputs(self):
         keys = pygame.key.get_pressed()
+        # Comparing a boolean variable to a boolean is a crime:
+        # if not self.player_busy
+        # instead of 
+        # if self.player_busy == False
+        # ...
         if keys[pygame.K_q] and (self.player_busy == False) and (self.can_switch_weapons == True): #Cycle weapon
             self.player_busy = True
             self.can_switch_weapons = False
@@ -184,6 +205,7 @@ class Player(pygame.sprite.Sprite): # Character class
 				
             self.weapon = list(weapon_data.keys())[self.weapon_index]
         
+        # Boolean comparison is a sin!!!!!!!!!!!
         if keys[pygame.K_SPACE] and (self.player_busy == False): # Attack
             self.player_busy = True
             self.attack_time = pygame.time.get_ticks()
