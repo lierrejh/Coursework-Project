@@ -7,6 +7,7 @@ from player import Player
 from tiles import *
 from ui import UI
 from attack import Weapon
+from settings import *
 
 pygame.font.init()
 pygame.init()
@@ -57,9 +58,9 @@ class Game:
             keys = pygame.key.get_pressed() #testing wave system
             for event in pygame.event.get():
                 if event.type == pygame.KEYDOWN:
-                    if (event.key == pygame.K_ESCAPE) and (game_paused == True): #Unpause on escape if game is paused
+                    if (event.key == pygame.K_ESCAPE) and (game_paused): #Unpause on escape if game is paused
                         game_paused = False
-                    elif (event.key == pygame.K_ESCAPE) and (game_paused == False): #Pause on escape
+                    elif (event.key == pygame.K_ESCAPE) and (not game_paused): #Pause on escape
                         game_paused = True
                     elif keys[pygame.K_f]: #testing wave system / remove later
                         wave += 1

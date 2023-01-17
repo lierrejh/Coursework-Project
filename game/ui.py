@@ -1,5 +1,5 @@
 import pygame
-from settings import *
+import settings
 
 class UI():
     def __init__(self):
@@ -8,7 +8,7 @@ class UI():
 
         #Weapon Images
         self.weapon_images = []
-        for weapon in weapon_data.values():
+        for weapon in settings.WEAPON_DATA.values():
             path = weapon['image']
             weapon = pygame.image.load(path).convert_alpha()
             self.weapon_images.append(weapon)

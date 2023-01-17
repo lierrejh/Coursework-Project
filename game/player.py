@@ -1,22 +1,22 @@
 import pygame 
 from tilesheet import Tilesheet
 from tiles import *
-from settings import *
+import settings
 
 
-tilesheet = Tilesheet('assets/sprites+items/0x72_16x16DungeonTileset.v4.png', 16, 16, 16, 16)
-map = Tilemap('assets/map/MapTest3.csv', tilesheet)
-clock = pygame.time.Clock()
-cardinalDirections = [(0, -1), (1, 0), (0, 1), (-1, 0), (0, 0)]
+TILESHEET = Tilesheet('assets/sprites+items/0x72_16x16DungeonTileset.v4.png', 16, 16, 16, 16)
+MAP = Tilemap('assets/map/MapTest3.csv', TILESHEET)
+CARDINAL_DIRECTIONS = [(0, -1), (1, 0), (0, 1), (-1, 0), (0, 0)]
 
 
 class Player(pygame.sprite.Sprite): # Character class
     def __init__(self, game, x , y, group, create_attack, remove_attack): # Organise init
         super().__init__(group)
         self.color = (250,0,0)
-        self.screen = pygame.display.set_mode((1600, 1000))
+        self.screen = pygame.display.set_mode((settings.SCREEN_WIDTH, settings.SCREEN_HEIGHT))
         self.game = game
-        self.left_pressed, self.right_pressed = False, False
+        self.left_pressed = False
+        self.right_pressed = False
         self.speed = 4
         #self.image = pygame.image.load('assets/sprites+items/individual_sprites/0x72_16x16DungeonTileset-245.png').convert_alpha()
         self.image = pygame.image.load('assets/sprites+items/individual_sprites/StartingCharacter.png').convert_alpha()
@@ -47,7 +47,7 @@ class Player(pygame.sprite.Sprite): # Character class
         self.weapon_index = 0
         self.player_busy = False
         self.can_switch_weapons = True
-        self.weapon = list(weapon_data.keys())[self.weapon_index]
+        self.weapon = list(settings.WEAPON_DATA.keys())[self.weapon_index]
         self.weapon_switch_time = None
         self.switch_duration_cooldown = 200
         self.create_attack = create_attack
@@ -71,14 +71,14 @@ class Player(pygame.sprite.Sprite): # Character class
         self.position.x += self.direction.x * self.speed
         self.hitbox.centerx = round(self.position.x)
         self.rect.centerx = self.hitbox.centerx
-        self.checkCollisionsX(collisionList)
+        self.check_collisions_x(collisionList)
 
         
         #Vertical Movement
         self.position.y += self.direction.y * self.speed
         self.hitbox.centery = round(self.position.y)
         self.rect.centery = self.hitbox.centery
-        self.checkCollisionsY(collisionList)
+        self.check_collisions_y(collisionList)
 
         if self.left_facing:
             self.image = self.user_flipped
@@ -87,13 +87,13 @@ class Player(pygame.sprite.Sprite): # Character class
         
     def get_damage(self, amount):
         if self.target_health > 0:
-            self.target_health -= amount
+            self.target_health = max(self.target_health - amount, 0)
         if self.target_health <= 0:
             self.target_health = 0
 
     def get_health(self, amount):
         if self.target_health < self.maximum_health:
-            self.target_health += amount
+            self.target_health = max(self.target_health + amount, 0)
         if self.target_health >= self.maximum_health:
             self.target_health = self.maximum_health
     
@@ -148,7 +148,7 @@ class Player(pygame.sprite.Sprite): # Character class
                 hits.append(tile)
         return hits
 
-    def checkCollisionsX(self, collisionList):
+    def check_collisions_x(self, collisionList):
         collisions = self.get_hits(collisionList)
         for tile in collisions:
             if self.direction.x > 0: #Moving right
@@ -161,7 +161,7 @@ class Player(pygame.sprite.Sprite): # Character class
             self.position.x = self.rect.centerx
 
     
-    def checkCollisionsY(self, collisionList):
+    def check_collisions_y(self, collisionList):
         collisions = self.get_hits(collisionList)
         for tile in collisions:
             if self.direction.y > 0:
@@ -173,20 +173,20 @@ class Player(pygame.sprite.Sprite): # Character class
 
     def attack_inputs(self):
         keys = pygame.key.get_pressed()
-        if keys[pygame.K_q] and (self.player_busy == False) and (self.can_switch_weapons == True): #Cycle weapon
+        if keys[pygame.K_q] and (not self.player_busy) and (self.can_switch_weapons): #Cycle weapon
             self.player_busy = True
             self.can_switch_weapons = False
             self.weapon_switch_time = pygame.time.get_ticks()
 			
-            if self.weapon_index < len(list(weapon_data.keys())) - 1:
+            if self.weapon_index < len(list(settings.WEAPON_DATA.keys())) - 1:
                 self.weapon_index += 1
             else:
                 self.weapon_index = 0
 				
-            self.weapon = list(weapon_data.keys())[self.weapon_index]
+            self.weapon = list(settings.WEAPON_DATA.keys())[self.weapon_index]
         
-        if keys[pygame.K_SPACE] and (self.player_busy == False): # Attack
-            if self.direction in cardinalDirections: # Can not attack in a diagonal direction
+        if keys[pygame.K_SPACE] and (not self.player_busy): # Attack
+            if self.direction in CARDINAL_DIRECTIONS: # Can not attack in a diagonal direction
                 self.player_busy = True
                 self.attack_time = pygame.time.get_ticks()
                 self.create_attack()

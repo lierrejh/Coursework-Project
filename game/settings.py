@@ -1,4 +1,11 @@
-weapon_data = {
+# Description: This file contains all the settings for the game
+
+# Key Settings:
+SCREEN_WIDTH = 1600
+SCREEN_HEIGHT = 1000
+
+
+WEAPON_DATA = {
     "wooden-sword" : {'cooldown' : 200, 'damage' : 10, 'image' : 'assets/sprites+items/weapons/wooden-sword.png' },
     "iron-sword" : {'cooldown' : 150, 'damage' : 20, 'image' : 'assets/sprites+items/weapons/iron-Sword.png' },
     "gem-iron-sword" : {'cooldown' : 150, 'damage' : 25, 'image' : 'assets/sprites+items/weapons/gem-iron-sword.png' },
