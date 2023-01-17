@@ -7,6 +7,7 @@ from settings import *
 tilesheet = Tilesheet('assets/sprites+items/0x72_16x16DungeonTileset.v4.png', 16, 16, 16, 16)
 map = Tilemap('assets/map/MapTest3.csv', tilesheet)
 clock = pygame.time.Clock()
+cardinalDirections = [(0, -1), (1, 0), (0, 1), (-1, 0), (0, 0)]
 
 
 class Player(pygame.sprite.Sprite): # Character class
@@ -50,8 +51,8 @@ class Player(pygame.sprite.Sprite): # Character class
         self.weapon_switch_time = None
         self.switch_duration_cooldown = 200
         self.create_attack = create_attack
-        self.attack_time = None
-        self.attack_cooldown = 400
+        self.attack_time = 0
+        self.attack_cooldown = 250
         self.remove_attack = remove_attack
 
     def update(self,tileWall,collisionList):
@@ -185,9 +186,10 @@ class Player(pygame.sprite.Sprite): # Character class
             self.weapon = list(weapon_data.keys())[self.weapon_index]
         
         if keys[pygame.K_SPACE] and (self.player_busy == False): # Attack
-            self.player_busy = True
-            self.attack_time = pygame.time.get_ticks()
-            self.create_attack()
+            if self.direction in cardinalDirections: # Can not attack in a diagonal direction
+                self.player_busy = True
+                self.attack_time = pygame.time.get_ticks()
+                self.create_attack()
 
     
     def cooldowns(self):
@@ -197,6 +199,7 @@ class Player(pygame.sprite.Sprite): # Character class
                     if current_time - self.weapon_switch_time >= self.switch_duration_cooldown:
                         self.can_switch_weapons = True
                         self.player_busy = False
+                        self.remove_attack()
                         
         if self.player_busy:
             if current_time - self.attack_time >= self.attack_cooldown:
