@@ -2,6 +2,7 @@ import pygame
 from tilesheet import Tilesheet
 from tiles import *
 import settings
+from ui import UI
 
 
 TILESHEET = Tilesheet('assets/sprites+items/0x72_16x16DungeonTileset.v4.png', 16, 16, 16, 16)
@@ -43,16 +44,19 @@ class Player(pygame.sprite.Sprite): # Character class
         self.target_health = 1000
         self.health_change_speed = 5
 
-        #Weapon Sysem
+        # Weapon Sysem
         self.weapon_index = 0
         self.player_busy = False
         self.can_switch_weapons = True
         self.weapon = list(settings.WEAPON_DATA.keys())[self.weapon_index]
-        self.weapon_switch_time = None
-        self.switch_duration_cooldown = 200
+        self.switch_duration_cooldown = 1000
         self.create_attack = create_attack
+        
+            # Set by ticks
+        self.switch_time = 0 
         self.attack_time = 0
-        self.attack_cooldown = 250
+        
+       
         self.remove_attack = remove_attack
 
     def update(self,tileWall,collisionList):
@@ -173,10 +177,13 @@ class Player(pygame.sprite.Sprite): # Character class
 
     def attack_inputs(self):
         keys = pygame.key.get_pressed()
-        if keys[pygame.K_q] and (not self.player_busy) and (self.can_switch_weapons): #Cycle weapon
+        current_time = pygame.time.get_ticks()
+        
+        # Cycle weapon if Q is pressed and the player is not busy
+        if keys[pygame.K_q] and (not self.player_busy) and (self.can_switch_weapons) and (current_time - self.switch_time >= self.switch_duration_cooldown):
             self.player_busy = True
             self.can_switch_weapons = False
-            self.weapon_switch_time = pygame.time.get_ticks()
+            self.switch_time = pygame.time.get_ticks()
 			
             if self.weapon_index < len(list(settings.WEAPON_DATA.keys())) - 1:
                 self.weapon_index += 1
@@ -185,24 +192,28 @@ class Player(pygame.sprite.Sprite): # Character class
 				
             self.weapon = list(settings.WEAPON_DATA.keys())[self.weapon_index]
         
-        if keys[pygame.K_SPACE] and (not self.player_busy): # Attack
-            if self.direction in CARDINAL_DIRECTIONS: # Can not attack in a diagonal direction
+        # Attack
+        attack_duration_cooldown = settings.WEAPON_DATA.get(f'{self.weapon}').get('cooldown')
+
+        if keys[pygame.K_SPACE] and (not self.player_busy) and ((current_time - self.attack_time >= attack_duration_cooldown)):
+            # Can not attack if player moving in a diagonal direction
+            if self.direction in CARDINAL_DIRECTIONS: 
                 self.player_busy = True
                 self.attack_time = pygame.time.get_ticks()
                 self.create_attack()
 
     
     def cooldowns(self):
+        #UI.cooldown_bar(self)
         current_time = pygame.time.get_ticks()
         
         if not self.can_switch_weapons:
-                    if current_time - self.weapon_switch_time >= self.switch_duration_cooldown:
+                    if current_time - self.switch_time >= self.switch_duration_cooldown:
                         self.can_switch_weapons = True
-                        self.player_busy = False
-                        self.remove_attack()
+
                         
         if self.player_busy:
-            if current_time - self.attack_time >= self.attack_cooldown:
+            if current_time - self.attack_time >= 200:
                 self.player_busy = False
                 self.remove_attack()
 
