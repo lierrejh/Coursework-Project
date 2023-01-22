@@ -1,3 +1,7 @@
+# Write up:
+# Tile map based game allows for a lot more customisability with generation
+# Describe struggles of doing it this way
+
 #For loading map
 
 import pygame, csv, os

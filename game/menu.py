@@ -1,3 +1,5 @@
+# Finish settings
+
 from buttoncontrol import Button
 import pygame
 import os
@@ -12,10 +14,10 @@ screen = pygame.display.set_mode((settings.SCREEN_WIDTH, settings.SCREEN_HEIGHT)
 start_button = buttoncontrol.Button(575, 15, pygame.image.load("assets/buttons/Start_Button.png").convert_alpha(), 0.8)
 options_button = buttoncontrol.Button(575, 315, pygame.image.load("assets/buttons/Options_Button.png").convert_alpha(), 0.8)
 quit_button = buttoncontrol.Button(575, 615, pygame.image.load("assets/buttons/Quit_Button.png").convert_alpha(), 0.8)
-back_button = buttoncontrol.Button(585, 650, pygame.image.load("assets/buttons/Back_Button.png").convert_alpha(), 0.8)
-keyb_button = buttoncontrol.Button(600, 415, pygame.image.load("assets/buttons/Key_Bindings.png").convert_alpha(), 0.8)
-audio_button = buttoncontrol.Button(600, 215, pygame.image.load("assets/buttons/Audio_Settings.png").convert_alpha(), 0.8)
-video_button = buttoncontrol.Button(600, 15, pygame.image.load("assets/buttons/Video_Settings.png").convert_alpha(), 0.8)
+back_button = buttoncontrol.Button(575, 615, pygame.image.load("assets/buttons/Back_Button.png").convert_alpha(), 0.8)
+keyb_button = buttoncontrol.Button(595, 415, pygame.image.load("assets/buttons/Key_Bindings.png").convert_alpha(), 0.8)
+audio_button = buttoncontrol.Button(595, 215, pygame.image.load("assets/buttons/Audio_Settings.png").convert_alpha(), 0.8)
+video_button = buttoncontrol.Button(595, 15, pygame.image.load("assets/buttons/Video_Settings.png").convert_alpha(), 0.8)
 resume_button = buttoncontrol.Button(575, 15, pygame.image.load("assets/buttons/Resume_Button.png").convert_alpha(), 0.8)
 
 
@@ -91,8 +93,8 @@ class OptionsMenu:
         run = True
 
         while run:
-            bg = pygame.Surface((self.width, self.height)).convert_alpha()
-            bg.fill([0, 0, 0, 0])
+            bg = pygame.Surface((self.width, self.height))
+            bg.fill([0, 0, 0])
             self.screen.blit(bg, (0, 0))
 
             if self.state == "main":  # menu settings for initial menu

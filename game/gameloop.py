@@ -1,3 +1,6 @@
+# Goals:
+# Time scaling
+
 from tkinter import Y
 import pygame
 import buttoncontrol
