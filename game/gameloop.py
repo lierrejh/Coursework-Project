@@ -14,7 +14,7 @@ from settings import *
 
 pygame.font.init()
 pygame.init()
-map = Tilemap('assets/map/MapTest3.csv', tilesheet)
+map = Tilemap('assets/map/MapTest2.csv', tilesheet)
 FPS = 60
 clock = pygame.time.Clock()
 
