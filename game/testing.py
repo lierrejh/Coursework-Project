@@ -1,4 +1,6 @@
 import csv, os, random
+from collections import defaultdict
+
 # Write up:
 # Write about Room gen process and issues/figuring out what I should do
 # Easier when spoken about but harder when actually doing
@@ -24,92 +26,89 @@ def create_blank_CSV():
             a = csv.writer(file,delimiter=',')
             row = []
             # Sets all values to -1 which is dark
-            for i in range(1,81):
+            for i in range(1,151):
                 row.append('-1')
             
-            for j in range(1,101):
+            for j in range(1,151):
                 a.writerow(row)
     except:
         os.remove("assets/map/MapTest2.csv")
         create_blank_CSV()
 
 # Room generation algorithm
-def generate_room_positions(room_center_points, i):
-    # a = csv.reader(open('assets/map/MapTest2.csv'))
-    # lines = list(a)
-    # lines[2][1] = '20'
-    # writer = csv.writer(open('assets/map/MapTest2.csv', 'w'))
-    # writer.writerows(lines)
-
     #BSP?
     #Place room centers, scan list to find room centers and then expand by a range (to make room larger)
     #Save location of room centers
     #Djikstra's in between rooms centers to make paths
-    
-    points = []
-    points.append(random.randint(10,70))
-    points.append(random.randint(10,90))
-
-def check_room_locations(coords, i):
-    pass
-
-    
 
 
-def room_generation():
-    create_blank_CSV()
-    room_center_points = []
-    # Generating typical rooms within generation
-    # Cannot use for loop, must be while -> Needs cases where it does or does not increase
-    THRESHHOLD_DISTANCE = 10
-    MAX_ROOMS = 9
-    too_close = False
+def room_expansion(points):
+    tiles = []
+    # Iterate through the points
+    for point in points:
+        x, y = point
+        # Iterate through the tiles in a 10 by 10 radius
+        for i in range(x-8, x+9):
+            for j in range(y-8, y+9):
+                tile = (i, j)
+                # Append the tile to the list if it is not already in the list
+                if tile not in tiles:
+                    tiles.append(list(tile))
+    return tiles
 
-    while len(room_center_points) < MAX_ROOMS:
-        # Only on first iteration will it be added to the list
-        # print(i)
-        if i == 0:    
-            room_center_points.append(generate_room_positions(room_center_points))
-            # print(room_center_points)
-            i += 1
-        # Otherwise check against other room positions to make sure not too close    
-        else:
-            new_points = generate_room_positions(room_center_points, i)
-            # print(new_points)
-            for k in room_center_points:
-                if ((new_points[0] <= k[0] + 10) and (new_points[1] <= k[1] + 10))  or ((new_points[0] == k[0] - 10) and (new_points[1] == k[1] - 10)):
-                    checks += 1 
-                    print(checks)
-            if checks == 9:
-                room_center_points.append(new_points)
-                i +=1 
-    
-    print(room_center_points)
+def update_CSV(tiles):
     a = csv.reader(open('assets/map/MapTest2.csv'))
     lines = list(a)
-    for i in room_center_points:
+    for i in tiles:
         ROW_NUM = i[0]
         COL_NUM = i[1]
-        lines[COL_NUM][ROW_NUM] = '50'
+        lines[ROW_NUM][COL_NUM] = '50'
         writer = csv.writer(open('assets/map/MapTest2.csv', 'w'))
         writer.writerows(lines)
 
 
-    
-    # list = [[1,3], [2,4]]
-    # print(list[1][0])
-    # Multi-dimensional lists will be very useful!
+def central_points_generation():
+    create_blank_CSV()
+    room_center_points = []
+    # Generating typical rooms within generation
+    # Cannot use for loop, must be while -> Needs cases where it does or does not increase
+    THRESHOLD_DISTANCE = 20
+    MAX_ROOMS = 9
+    too_close = False
+
+    while len(room_center_points) < MAX_ROOMS:
+        # Generate random room_center_points
+        cols = random.randint(10, 90)
+        rows = random.randint(10, 90)
+        point = (rows, cols)
+
+        # Check if the point is too close to any existing point
+        too_close = False
+        for existing_point in room_center_points:
+            distance = ((existing_point[0] - point[0]) ** 2 + (existing_point[1] - point[1]) ** 2) ** 0.5
+            if distance < THRESHOLD_DISTANCE:
+                too_close = True
+                break
+
+        # If the point is not too close, add it to the list
+        if not too_close:
+            room_center_points.append(list(point))
+
+        # # Create a dictionary to store the graph
+        # graph = defaultdict(list)
+
+        # # Create a path between the room_center_points using Dijkstra's algorithm
+        # for i in range(len(room_center_points)):
+        #     for j in range(i+1, len(room_center_points)):
+        #         distance = ((room_center_points[i][0] - room_center_points[j][0]) ** 2 + (room_center_points[i][1] - room_center_points[j][1]) ** 2) ** 0.5
+        #         graph[i].append((j, distance))
+        #         graph[j].append((i, distance))
+
+    return room_center_points
+
+def room_generation():
+    room_center_points = central_points_generation()
+    full_room = room_expansion(room_center_points)
+    update_CSV(full_room)
 
 room_generation()
-
-""" Write a function for implementing path generation between points in the map"""
-# Path generation algorithm
-def room_generation():
-    Generate random points
-    Check if points are too close to eachother
-    If not then add to list
-    If so then generate new points
-    Once 9 points are generated then create a path between them
-    Use Djikstra's algorithm to create path between points
-    Save path in CSV file
-    Use the CSV file to create the map 

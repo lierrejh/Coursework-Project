@@ -21,7 +21,7 @@ class Player(pygame.sprite.Sprite): # Character class
         self.game = game
         self.left_pressed = False
         self.right_pressed = False
-        self.speed = 4
+        self.speed = 6
         #self.image = pygame.image.load('assets/sprites+items/individual_sprites/0x72_16x16DungeonTileset-245.png').convert_alpha()
         self.image = pygame.image.load('assets/sprites+items/individual_sprites/StartingCharacter.png').convert_alpha()
         self.direction = pygame.math.Vector2() 
