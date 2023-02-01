@@ -1,5 +1,8 @@
 import csv, os, random
 from collections import defaultdict
+import heapq
+from typing import List, Tuple
+
 
 # Write up:
 # Write about Room gen process and issues/figuring out what I should do
@@ -26,10 +29,10 @@ def create_blank_CSV():
             a = csv.writer(file,delimiter=',')
             row = []
             # Sets all values to -1 which is dark
-            for i in range(1,151):
+            for i in range(1,131):
                 row.append('-1')
             
-            for j in range(1,151):
+            for j in range(1,71):
                 a.writerow(row)
     except:
         os.remove("assets/map/MapTest2.csv")
@@ -41,6 +44,24 @@ def create_blank_CSV():
     #Save location of room centers
     #Djikstra's in between rooms centers to make paths
 
+def border_tiles(file_path):
+    with open(file_path, 'r') as file:
+        reader = csv.reader(file)
+        data = list(reader)
+        border_tiles = []
+        for i in range(len(data)):
+            for j in range(len(data[0])):
+                if data[i][j] == '50':
+                    if i > 0 and data[i-1][j] == '-1':
+                        border_tiles.append((i, j))
+                    if i < len(data) - 1 and data[i+1][j] == '-1':
+                        border_tiles.append((i, j))
+                    if j > 0 and data[i][j-1] == '-1':
+                        border_tiles.append((i, j))
+                    if j < len(data[0]) - 1 and data[i][j+1] == '-1':
+                        border_tiles.append([i, j])
+        return border_tiles
+
 
 def room_expansion(points):
     tiles = []
@@ -48,21 +69,24 @@ def room_expansion(points):
     for point in points:
         x, y = point
         # Iterate through the tiles in a 10 by 10 radius
-        for i in range(x-8, x+9):
-            for j in range(y-8, y+9):
+        for i in range(x-6, x+7):
+            for j in range(y-6, y+7):
                 tile = (i, j)
                 # Append the tile to the list if it is not already in the list
                 if tile not in tiles:
                     tiles.append(list(tile))
     return tiles
 
-def update_CSV(tiles):
+def update_CSV(tiles, tile_type):
     a = csv.reader(open('assets/map/MapTest2.csv'))
     lines = list(a)
     for i in tiles:
         ROW_NUM = i[0]
         COL_NUM = i[1]
-        lines[ROW_NUM][COL_NUM] = '50'
+        if tile_type == 'Floor':
+            lines[ROW_NUM][COL_NUM] = '50'
+        elif tile_type == 'Wall':
+            lines[ROW_NUM][COL_NUM] = '16'
         writer = csv.writer(open('assets/map/MapTest2.csv', 'w'))
         writer.writerows(lines)
 
@@ -72,14 +96,14 @@ def central_points_generation():
     room_center_points = []
     # Generating typical rooms within generation
     # Cannot use for loop, must be while -> Needs cases where it does or does not increase
-    THRESHOLD_DISTANCE = 20
-    MAX_ROOMS = 9
+    THRESHOLD_DISTANCE = 16
+    MAX_ROOMS = 7
     too_close = False
 
     while len(room_center_points) < MAX_ROOMS:
         # Generate random room_center_points
-        cols = random.randint(10, 90)
-        rows = random.randint(10, 90)
+        cols = random.randint(25, 75)
+        rows = random.randint(12, 50)
         point = (rows, cols)
 
         # Check if the point is too close to any existing point
@@ -93,22 +117,86 @@ def central_points_generation():
         # If the point is not too close, add it to the list
         if not too_close:
             room_center_points.append(list(point))
-
-        # # Create a dictionary to store the graph
-        # graph = defaultdict(list)
-
-        # # Create a path between the room_center_points using Dijkstra's algorithm
-        # for i in range(len(room_center_points)):
-        #     for j in range(i+1, len(room_center_points)):
-        #         distance = ((room_center_points[i][0] - room_center_points[j][0]) ** 2 + (room_center_points[i][1] - room_center_points[j][1]) ** 2) ** 0.5
-        #         graph[i].append((j, distance))
-        #         graph[j].append((i, distance))
-
+    #print(room_center_points)
     return room_center_points
 
+from typing import List, Tuple
+
+def remove_overlapping_points(path: List[List[int]]) -> List[List[int]]:
+    unique_points = []
+    for point in path:
+        if point not in unique_points:
+            unique_points.append(point)
+    return unique_points
+
+def create_path(points: List[List[int]]) -> List[Tuple[int, int]]:
+    points = [tuple(point) for point in points]
+    path = [list(points[0])]
+    for i in range(len(points) - 1):
+        path += bresenham(points[i], points[i + 1])
+    return path
+
+def bresenham(p1: Tuple[int, int], p2: Tuple[int, int]) -> List[Tuple[int, int]]:
+    x1, y1 = p1
+    x2, y2 = p2
+    path = []
+    dx = abs(x2 - x1)
+    dy = abs(y2 - y1)
+    x, y = x1, y1
+    sx = -1 if x1 > x2 else 1
+    sy = -1 if y1 > y2 else 1
+    if dx > dy:
+        err = dx / 2.0
+        while x != x2:
+            path.append([x, y])
+            err -= dy
+            if err < 0:
+                y += sy
+                err += dx
+            x += sx
+    else:
+        err = dy / 2.0
+        while y != y2:
+            path.append([x, y])
+            err -= dx
+            if err < 0:
+                x += sx
+                err += dy
+            y += sy
+    path.append([x, y])
+    return path
+
+
+
+
+def expand_path(path: List[Tuple[int, int]], radius: int) -> List[Tuple[int, int]]:
+    expanded_path = []
+    for point in path:
+        x, y = point[0], point[1]
+        for i in range(x - radius, x + radius + 1):
+            for j in range(y - radius, y + radius + 1):
+                expanded_path.append([i, j])
+    return expanded_path
+
+
+
+
 def room_generation():
+    FLOOR = 'Floor'
+    WALL = 'Wall'
+    
     room_center_points = central_points_generation()
-    full_room = room_expansion(room_center_points)
-    update_CSV(full_room)
+    expanded_room = room_expansion(room_center_points)
+
+    path = remove_overlapping_points(create_path(room_center_points))
+    # path = create_path(room_center_points)
+    #print(path2)
+    #update_CSV(path)
+    update_CSV(expand_path(path, 2), FLOOR)
+    update_CSV(expanded_room, FLOOR)
+    update_CSV(border_tiles('assets/map/MapTest2.csv'), WALL)
+    
+    # full_room = room_expansion(room_center_points)
+    # update_CSV(full_room)
 
 room_generation()

@@ -50,12 +50,12 @@ class Tilemap(pygame.sprite.Sprite):
             tile.draw(self.map_surface) 
 
     def read_csv(self, filename): #algorithm taken from Pygame Tile Based Game Tutorial: Tilemaps
-        mapList = []
+        map_list = []
         with open(os.path.join(filename)) as data:
             data = csv.reader(data, delimiter=',')
             for row in data:
-                mapList.append(list(row))
-        return mapList
+                map_list.append(list(row))
+        return map_list
 
     def load_tiles(self, filename):
         tiles = []
