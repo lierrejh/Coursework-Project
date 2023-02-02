@@ -25,19 +25,20 @@ tilesheet = Tilesheet('assets/sprites+items/0x72_16x16DungeonTileset.v4.png', 16
 
 class Game:
     
-    def __init__(self, screen):
+    def __init__(self, screen, player_starting_position):
         self.clock = pygame.time.Clock()
         self.bg_colour = pygame.Color('black')
         self.resumeButton = pygame.image.load("assets/buttons/Resume_Button.png").convert_alpha()
         self.tiles = Tilesheet('assets/sprites+items/0x72_16x16DungeonTileset.v4.png', 16, 16, 16, 16)
         self.screen = screen
         self.visible_sprites = YSortCamera()
+        self.y, self.x = player_starting_position[0][0], player_starting_position[0][1]
         # self.obstacle_sprites = pygame.sprite.Group()
         # self.user = Player(self,1250,1300, [self.visible_sprites], self.obstacle_sprites)
         self.tile_size = 16
         # visible_sprites = YSortCamera()
         # obstacle_sprites = pygame.sprite.Group()
-        self.user = Player(self,1250,1300, self.visible_sprites, self.create_attack, self.remove_attack)
+        self.user = Player(self,self.x, self.y, self.visible_sprites, self.create_attack, self.remove_attack)
         self.UI = UI()
         self.current_attack = None
 
@@ -121,5 +122,5 @@ class YSortCamera(pygame.sprite.Group): #Camera system
             self.screen.blit(pygame.transform.scale(sprite.image , (50,50)), offset_pos)
             #self.screen.blit(sprite.image , offset_pos)
  
-
+    #def get_impor
 

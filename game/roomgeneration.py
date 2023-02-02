@@ -1,6 +1,4 @@
 import csv, os, random
-from collections import defaultdict
-import heapq
 from typing import List, Tuple
 
 
@@ -21,6 +19,7 @@ from typing import List, Tuple
 # Issues with implementing boss room (special sizing) etc
 # Tried using algo but took too long (too slow time eff)
 # What about having a list and taking all values from the list leaving you with one left
+
 
 # Creates a new CSV (for map) if not already one otherwise replaces the old one
 def create_blank_CSV():
@@ -120,8 +119,6 @@ def central_points_generation():
     #print(room_center_points)
     return room_center_points
 
-from typing import List, Tuple
-
 def remove_overlapping_points(path: List[List[int]]) -> List[List[int]]:
     unique_points = []
     for point in path:
@@ -179,7 +176,13 @@ def expand_path(path: List[Tuple[int, int]], radius: int) -> List[Tuple[int, int
     return expanded_path
 
 
-
+def get_spawn_points(points):
+    converted_points = []
+    for i in points:
+        x = i[0] * 40
+        y = i[1] * 39
+        converted_points.append([x, y])
+    return converted_points
 
 def room_generation():
     FLOOR = 'Floor'
@@ -189,14 +192,15 @@ def room_generation():
     expanded_room = room_expansion(room_center_points)
 
     path = remove_overlapping_points(create_path(room_center_points))
-    # path = create_path(room_center_points)
-    #print(path2)
-    #update_CSV(path)
+
+    # Update the CSV
     update_CSV(expand_path(path, 2), FLOOR)
     update_CSV(expanded_room, FLOOR)
     update_CSV(border_tiles('assets/map/MapTest2.csv'), WALL)
     
-    # full_room = room_expansion(room_center_points)
-    # update_CSV(full_room)
+    # Return converted points to map scale
+    return get_spawn_points(room_center_points)
+    
 
-room_generation()
+
+    

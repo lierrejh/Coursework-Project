@@ -5,6 +5,8 @@ import pygame
 import os
 import buttoncontrol
 import settings
+from roomgeneration import room_generation
+import random
 
 # initialise pygame and screen
 pygame.init()
@@ -28,7 +30,14 @@ class MainMenu:
         self.bg = pygame.image.load("assets/mainmenu/background.jpg")
         self.screen = screen
         self.state = "main"
+        self.coords = []
 
+    def get_player_spawn(points):
+        random_spawn_index = random.randint(0,len(points))
+        spawn_point = []
+        spawn_point.append(points[random_spawn_index])
+        return spawn_point
+    
     def run(self):
 
         run = True
@@ -39,9 +48,11 @@ class MainMenu:
             # menu settings for initial menu
             if self.state == "main":
                 if start_button.draw(self.screen):
+                    room_center_points = room_generation()
+                    coords = MainMenu.get_player_spawn(room_center_points)
                     # strange import location due to preventing circular imports
                     from gameloop import Game
-                    game = Game(self.screen)
+                    game = Game(self.screen, coords)
                     game.game_loop(self.screen)
                     del game
                 if options_button.draw(self.screen):
