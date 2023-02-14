@@ -23,3 +23,9 @@ WEAPON_DATA = {
     "moonlight-sword" : {'cooldown' : 800, 'damage' : 60, 'image' : 'assets/sprites+items/weapons/moonlight-sword.png' },
 
 }
+
+ENEMY_DATA = {
+    'goblin' : {'health' : 100, 'exp' : 50, 'damage' : 30, 'image' : 'assets/sprites+items/individual_sprites/0x72_16x16DungeonTileset-162.png', 'speed' : 3, 'resistance' : 3, 'attack_radius' : 50, 'notice_radius' : 350 },
+    'fire-demon' : {'health' : 200, 'exp' : 110, 'damage' : 50, 'image' : 'assets/sprites+items/individual_sprites/0x72_16x16DungeonTileset-178.png', 'speed' : 3, 'restitance' : 2, 'attack_radius' : 90, 'notice_radius' : 420 },
+    'mage' : {'health' : 300, 'exp' : 180, 'damage' : 40, 'image' : 'assets/sprites+items/individual_sprites/0x72_16x16DungeonTileset-149.png', 'speed' : 2, 'restitance' : 1, 'attack_radius' : 60, 'notice_radius' : 500 }
+}

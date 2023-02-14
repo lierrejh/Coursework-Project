@@ -6,15 +6,13 @@ from tilesheet import Tilesheet
 from tiles import *
 import settings
 from ui import UI
+from entities import Entities
 
-
-TILESHEET = Tilesheet('assets/sprites+items/0x72_16x16DungeonTileset.v4.png', 16, 16, 16, 16)
-MAP = Tilemap('assets/map/MapTest3.csv', TILESHEET)
 CARDINAL_DIRECTIONS = [(0, -1), (1, 0), (0, 1), (-1, 0), (0, 0)]
 
 
-class Player(pygame.sprite.Sprite): # Character class
-    def __init__(self, game, x , y, group, create_attack, remove_attack): # Organise init
+class Player(Entities): # Character class
+    def __init__(self, game, x , y, group, create_attack, remove_attack, tile_wall, collision_list): # Organise init
         super().__init__(group)
         self.color = (250,0,0)
         self.screen = pygame.display.set_mode((settings.SCREEN_WIDTH, settings.SCREEN_HEIGHT))
@@ -22,20 +20,18 @@ class Player(pygame.sprite.Sprite): # Character class
         self.left_pressed = False
         self.right_pressed = False
         self.speed = 4
-        #self.image = pygame.image.load('assets/sprites+items/individual_sprites/0x72_16x16DungeonTileset-245.png').convert_alpha()
+        self.tile_wall, self.collision_list = tile_wall, collision_list
         self.image = pygame.image.load('assets/sprites+items/individual_sprites/StartingCharacter.png').convert_alpha()
         self.direction = pygame.math.Vector2() 
         self.userTile = Tilesheet('assets/sprites+items/0x72_16x16DungeonTileset.v4.png', 16, 16, 16, 16)
-        self.user_flipped = pygame.transform.flip(self.image, True, False)    
+        self.image_flipped = pygame.transform.flip(self.image, True, False)    
         self.left_facing = False
         self.x = x
         self.y = y
-        #self.user = self.userTile.get_tile(15, 15), (400,400)
-        self.user = pygame.image.load('assets/sprites+items/individual_sprites/StartingCharacter.png').convert_alpha()
-        self.user_scaled = pygame.transform.scale(self.user, (25,40))
+        self.image2 = pygame.image.load('assets/sprites+items/individual_sprites/StartingCharacter.png').convert_alpha()
+        self.user_scaled = pygame.transform.scale(self.image2, (25,40))
         self.rect = self.user_scaled.get_rect(center = (self.x ,self.y))
         self.position = pygame.math.Vector2(self.rect.center)
-        #self.hitbox = self.rect.copy().inflate((25,40))
         self.hitbox = self.rect.inflate(40,35)
         self.display_surface = pygame.display.get_surface()
         
@@ -61,12 +57,12 @@ class Player(pygame.sprite.Sprite): # Character class
         
        
         self.remove_attack = remove_attack
-
-    def update(self,tileWall,collisionList):
+    
+    def update(self):
         self.movement_inputs()
-        self.attack_inputs()
+        self.attack_inputs(self.collision_list)
         self.cooldowns()
-
+        self.move(self.collision_list, 0)
         '''for tile in tileWall: #Testing wall boundary
             pygame.draw.rect(
                 self.screen,self.color, tile)'''
@@ -74,23 +70,7 @@ class Player(pygame.sprite.Sprite): # Character class
         '''if self.direction.magnitude() != 0: #Normalising diagonl movement in order to not gain extra acceleartion
             self.direction = self.direction.normalize()'''
 
-        #Horizontal movement
-        self.position.x += self.direction.x * self.speed
-        self.hitbox.centerx = round(self.position.x)
-        self.rect.centerx = self.hitbox.centerx
-        self.check_collisions_x(collisionList)
-
         
-        #Vertical Movement
-        self.position.y += self.direction.y * self.speed
-        self.hitbox.centery = round(self.position.y)
-        self.rect.centery = self.hitbox.centery
-        self.check_collisions_y(collisionList)
-
-        if self.left_facing:
-            self.image = self.user_flipped
-        else:
-            self.image = self.user
         
     def get_damage(self, amount):
         if self.target_health > 0:
@@ -145,18 +125,10 @@ class Player(pygame.sprite.Sprite): # Character class
             self.get_damage(100)
         else:
             self.direction.y = 0
-    
-    def get_hits(self, collisionList):
-        '''hits = pygame.sprite.spritecollide(self, collisionList, False)
-        return hits'''
-        hits = []
-        for tile in collisionList:
-            if self.hitbox.colliderect(tile):
-                hits.append(tile)
-        return hits
 
-    def check_collisions_x(self, collisionList):
-        collisions = self.get_hits(collisionList)
+
+    def check_collisions_x(self, collision_list):
+        collisions = self.get_hits(collision_list)
         for tile in collisions:
             if self.direction.x > 0: #Moving right
                 self.hitbox.right = tile.rect.left
@@ -166,10 +138,9 @@ class Player(pygame.sprite.Sprite): # Character class
                 self.position.x = self.rect.centerx
             self.rect.centerx = self.hitbox.centerx
             self.position.x = self.rect.centerx
-
     
-    def check_collisions_y(self, collisionList):
-        collisions = self.get_hits(collisionList)
+    def check_collisions_y(self, collision_list):
+        collisions = self.get_hits(collision_list)
         for tile in collisions:
             if self.direction.y > 0:
                 self.hitbox.bottom = tile.rect.top 
@@ -178,7 +149,7 @@ class Player(pygame.sprite.Sprite): # Character class
             self.rect.centery = self.hitbox.centery
             self.position.y = self.hitbox.centery
 
-    def attack_inputs(self):
+    def attack_inputs(self, collision_list):
         keys = pygame.key.get_pressed()
         current_time = pygame.time.get_ticks()
         
@@ -198,7 +169,14 @@ class Player(pygame.sprite.Sprite): # Character class
         # Attack
         attack_duration_cooldown = settings.WEAPON_DATA.get(f'{self.weapon}').get('cooldown')
 
-        if keys[pygame.K_SPACE] and (not self.player_busy) and ((current_time - self.attack_time >= attack_duration_cooldown)):
+        colliding = False
+        collisions = self.get_hits(collision_list)
+        if collisions:
+            colliding = True
+        else:
+            colliding = False
+
+        if keys[pygame.K_SPACE] and (not self.player_busy) and ((current_time - self.attack_time >= attack_duration_cooldown)) and not colliding:
             # Can not attack if player moving in a diagonal direction
             if self.direction in CARDINAL_DIRECTIONS: 
                 self.player_busy = True

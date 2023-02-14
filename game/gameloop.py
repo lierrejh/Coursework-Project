@@ -11,6 +11,8 @@ from tiles import *
 from ui import UI
 from attack import Weapon
 from settings import *
+from enemies import Enemies
+import random
 
 pygame.font.init()
 pygame.init()
@@ -25,28 +27,38 @@ tilesheet = Tilesheet('assets/sprites+items/0x72_16x16DungeonTileset.v4.png', 16
 
 class Game:
     
-    def __init__(self, screen, player_starting_position):
+    def __init__(self, screen, spawn_point, room_coords):
         self.clock = pygame.time.Clock()
         self.bg_colour = pygame.Color('black')
+
+        self.tile_wall, self.collision_list = map.tile_wall, map.collision_list
+
         self.resumeButton = pygame.image.load("assets/buttons/Resume_Button.png").convert_alpha()
         self.tiles = Tilesheet('assets/sprites+items/0x72_16x16DungeonTileset.v4.png', 16, 16, 16, 16)
         self.screen = screen
         self.visible_sprites = YSortCamera()
-        self.y, self.x = player_starting_position[0][0], player_starting_position[0][1]
-        # self.obstacle_sprites = pygame.sprite.Group()
-        # self.user = Player(self,1250,1300, [self.visible_sprites], self.obstacle_sprites)
+        self.y, self.x = spawn_point[0], spawn_point[1]
         self.tile_size = 16
-        # visible_sprites = YSortCamera()
-        # obstacle_sprites = pygame.sprite.Group()
-        self.user = Player(self,self.x, self.y, self.visible_sprites, self.create_attack, self.remove_attack)
+        self.user = Player(self,self.x, self.y, [self.visible_sprites], self.create_attack, self.remove_attack, self.tile_wall, self.collision_list)
         self.UI = UI()
         self.current_attack = None
+        self.enemy = None
+        self.spawn_point = spawn_point
+        self.coords = room_coords
+
+    def create_wave(self):
+        enemies = []
+        for i in range(1,7):
+            enemies.append(self.create_enemy())
+        # return enemies
 
 
     def game_loop(self, screen):
         #menu variables
+        print(self.coords)
         self.screen = screen
         game_paused = False
+        self.create_wave()
 
         run = True
         wave = 0
@@ -76,23 +88,37 @@ class Game:
         pygame.quit()
 
     def create_attack(self):
-        self.current_attack = Weapon(self.user,self.visible_sprites)
+        self.current_attack = Weapon(self.user,[self.visible_sprites])
 
     def remove_attack(self):
         if self.current_attack:
             self.current_attack.kill()
         self.current_attack = None
+
+    def create_enemy(self):
+        index = random.randint(0, (len(self.coords)-1))
+        self.enemy = Enemies(self, 'goblin', self.coords[index], [self.visible_sprites], self.collision_list)
+        self.coords.remove(self.coords[index])
+        
     
     def draw_window(self, wave):
         self.screen.fill(self.bg_colour)
         # self.tiles.draw(self.screen) for identifying tiles
         map.draw_map(self.screen)
-        #self.visible_sprites.update(map.tileWall)
-        self.user.update(map.tileWall, map.collisionList)
+
+        # Camera
         self.visible_sprites.custom_draw(self.user)
+        self.visible_sprites.update()
+        self.visible_sprites.enemy_update(self.user)
+
+
+        # Displaying UI        
         self.user.display_PlayerUI(self.user)
         self.UI.display(self.user, wave)
+
+        # self.visible_sprites.update(self.enemy, map.collision_list)
         pygame.display.flip()
+
 
 class YSortCamera(pygame.sprite.Group): #Camera system
     def __init__(self):
@@ -122,5 +148,8 @@ class YSortCamera(pygame.sprite.Group): #Camera system
             self.screen.blit(pygame.transform.scale(sprite.image , (50,50)), offset_pos)
             #self.screen.blit(sprite.image , offset_pos)
  
-    #def get_impor
+    def enemy_update(self, player):
+        enemy_sprites = [sprite for sprite in self.sprites() if hasattr(sprite, 'sprite_type') and sprite.sprite_type == 'enemy']
+        for enemy in enemy_sprites:
+            enemy.enemy_update(player)
 

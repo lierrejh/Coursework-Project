@@ -30,13 +30,10 @@ class MainMenu:
         self.bg = pygame.image.load("assets/mainmenu/background.jpg")
         self.screen = screen
         self.state = "main"
-        self.coords = []
 
     def get_player_spawn(points):
-        random_spawn_index = random.randint(0,len(points))
-        spawn_point = []
-        spawn_point.append(points[random_spawn_index])
-        return spawn_point
+        random_spawn_index = random.randint(0,len(points) -1)
+        return points[random_spawn_index]
     
     def run(self):
 
@@ -49,10 +46,12 @@ class MainMenu:
             if self.state == "main":
                 if start_button.draw(self.screen):
                     room_center_points = room_generation()
-                    coords = MainMenu.get_player_spawn(room_center_points)
+                    spawn_point = MainMenu.get_player_spawn(room_center_points)
+                    room_center_points.remove(spawn_point)
+                    
                     # strange import location due to preventing circular imports
                     from gameloop import Game
-                    game = Game(self.screen, coords)
+                    game = Game(self.screen, spawn_point, room_center_points)
                     game.game_loop(self.screen)
                     del game
                 if options_button.draw(self.screen):

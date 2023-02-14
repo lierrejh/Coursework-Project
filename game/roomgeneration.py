@@ -176,7 +176,7 @@ def expand_path(path: List[Tuple[int, int]], radius: int) -> List[Tuple[int, int
     return expanded_path
 
 
-def get_spawn_points(points):
+def get_converted_points(points):
     converted_points = []
     for i in points:
         x = i[0] * 40
@@ -199,7 +199,7 @@ def room_generation():
     update_CSV(border_tiles('assets/map/MapTest2.csv'), WALL)
     
     # Return converted points to map scale
-    return get_spawn_points(room_center_points)
+    return get_converted_points(room_center_points)
     
 
 
