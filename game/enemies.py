@@ -13,7 +13,7 @@ class Enemies(Entities):
         
         # Movement
         self.rect = self.image.get_rect(topleft = (coords[1],coords[0]))
-        self.hitbox = self.rect.inflate(0, -10)
+        self.hitbox = self.rect.inflate(40,35)
         self.position = pygame.math.Vector2(self.rect.center)
         self.direction = pygame.math.Vector2()
         self.left_facing = False
@@ -46,6 +46,7 @@ class Enemies(Entities):
         enemy_vector = pygame.math.Vector2(self.rect.center)
         player_vector = pygame.math.Vector2(player.rect.center)
         distance = (player_vector - enemy_vector).magnitude()
+        print(distance)
         
         if distance > 0:
             direction = (player_vector - enemy_vector).normalize()
@@ -79,5 +80,4 @@ class Enemies(Entities):
 
     def enemy_update(self, player):
         self.get_status(player)
-        print(self.status)
         self.actions(player)

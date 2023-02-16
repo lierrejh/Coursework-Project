@@ -126,29 +126,6 @@ class Player(Entities): # Character class
         else:
             self.direction.y = 0
 
-
-    def check_collisions_x(self, collision_list):
-        collisions = self.get_hits(collision_list)
-        for tile in collisions:
-            if self.direction.x > 0: #Moving right
-                self.hitbox.right = tile.rect.left
-                self.position.x = self.rect.centerx
-            elif self.direction.x < 0: #Moving left
-                self.hitbox.left = tile.rect.right
-                self.position.x = self.rect.centerx
-            self.rect.centerx = self.hitbox.centerx
-            self.position.x = self.rect.centerx
-    
-    def check_collisions_y(self, collision_list):
-        collisions = self.get_hits(collision_list)
-        for tile in collisions:
-            if self.direction.y > 0:
-                self.hitbox.bottom = tile.rect.top 
-            elif self.direction.y < 0:
-                self.hitbox.top = tile.rect.bottom
-            self.rect.centery = self.hitbox.centery
-            self.position.y = self.hitbox.centery
-
     def attack_inputs(self, collision_list):
         keys = pygame.key.get_pressed()
         current_time = pygame.time.get_ticks()
