@@ -4,7 +4,7 @@
 from tkinter import Y
 import pygame
 import buttoncontrol
-from menu import OptionsMenu
+from menu import OptionsMenu, MainMenu
 from tilesheet import Tilesheet
 from player import Player
 from tiles import *
@@ -13,6 +13,7 @@ from attack import Weapon
 from settings import *
 from enemies import Enemies
 import random
+from particles import ParticleObjects
 
 pygame.font.init()
 pygame.init()
@@ -30,13 +31,17 @@ class Game:
     def __init__(self, screen, spawn_point, room_coords):
         self.clock = pygame.time.Clock()
         self.bg_colour = pygame.Color('black')
-
         self.tile_wall, self.collision_list = map.tile_wall, map.collision_list
+        
 
         self.resumeButton = pygame.image.load("assets/buttons/Resume_Button.png").convert_alpha()
         self.tiles = Tilesheet('assets/sprites+items/0x72_16x16DungeonTileset.v4.png', 16, 16, 16, 16)
         self.screen = screen
         self.visible_sprites = YSortCamera()
+        self.damageable_sprites = pygame.sprite.Group()
+        self.non_damageable_sprites = pygame.sprite.Group()
+
+
         self.y, self.x = spawn_point[0], spawn_point[1]
         self.tile_size = 16
         self.user = Player(self,self.x, self.y, [self.visible_sprites], self.create_attack, self.remove_attack, self.tile_wall, self.collision_list)
@@ -46,18 +51,20 @@ class Game:
         self.spawn_point = spawn_point
         self.coords = room_coords
 
+        self.ParticleObjects = ParticleObjects()
+        self.screen = screen
+
     def create_wave(self):
         enemies = []
         for i in range(1,7):
             enemies.append(self.create_enemy())
         # return enemies
 
-
     def game_loop(self, screen):
         #menu variables
-        print(self.coords)
         self.screen = screen
         game_paused = False
+        
         self.create_wave()
 
         run = True
@@ -65,6 +72,10 @@ class Game:
         while run:
             self.dt = clock.tick(60) * .001 * FPS
             self.draw_window(wave) #passes wave into UI - make wave system with enemies
+
+            if self.user.dead:
+                run = False
+                self.restore()
 
             if game_paused == True: #options menu
                 optionsMenu = OptionsMenu(self.screen)
@@ -79,7 +90,8 @@ class Game:
                     elif (event.key == pygame.K_ESCAPE) and (not game_paused): #Pause on escape
                         game_paused = True
                     elif keys[pygame.K_f]: #testing wave system / remove later
-                        wave += 1
+                        pass
+                        # wave += 1
                 elif event.type == pygame.QUIT:
                     run = False
 
@@ -88,7 +100,7 @@ class Game:
         pygame.quit()
 
     def create_attack(self):
-        self.current_attack = Weapon(self.user,[self.visible_sprites])
+        self.current_attack = Weapon(self.user,[self.visible_sprites, self.non_damageable_sprites])
 
     def remove_attack(self):
         if self.current_attack:
@@ -97,10 +109,34 @@ class Game:
 
     def create_enemy(self):
         index = random.randint(0, (len(self.coords)-1))
-        self.enemy = Enemies(self, 'goblin', self.coords[index], [self.visible_sprites], self.collision_list)
+        self.enemy = Enemies(self, 'fire-demon', self.coords[index], [self.visible_sprites, self.damageable_sprites], self.collision_list, self.enemy_attacking_player)
         self.coords.remove(self.coords[index])
         
-    
+    def player_attacking_enemy(self):
+        if self.non_damageable_sprites:
+            for non_damageable_sprite in self.non_damageable_sprites:
+                collision = pygame.sprite.spritecollide(non_damageable_sprite, self.damageable_sprites, False)
+                if collision:
+                    for sprite in collision:
+                        sprite.get_damage(self.user, Player.get_total_weapon_damage(self.user))
+                        attack_type = 'blood'
+                        self.ParticleObjects.create_particles(attack_type, sprite.rect.center, [self.visible_sprites])
+
+
+
+    def enemy_attacking_player(self, amount, attack_type):
+        if self.user.vulnerable:
+            self.user.get_damage(amount)
+            self.user.vulnerable = False
+            self.user.hit_time = pygame.time.get_ticks()
+            self.ParticleObjects.create_particles(attack_type, self.user.rect.center, [self.visible_sprites])
+
+    def restore(self):
+        self.y, self.x = None, None
+        self.coords = None
+        main_menu = MainMenu()
+        main_menu.run()
+
     def draw_window(self, wave):
         self.screen.fill(self.bg_colour)
         # self.tiles.draw(self.screen) for identifying tiles
@@ -110,6 +146,7 @@ class Game:
         self.visible_sprites.custom_draw(self.user)
         self.visible_sprites.update()
         self.visible_sprites.enemy_update(self.user)
+        self.player_attacking_enemy()
 
 
         # Displaying UI        

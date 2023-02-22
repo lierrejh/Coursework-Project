@@ -12,6 +12,11 @@ class UI():
             path = weapon['image']
             weapon = pygame.image.load(path).convert_alpha()
             self.weapon_images.append(weapon)
+        self.item_images = []
+        for item in settings.ITEM_DATA.values():
+            path = item['image']
+            item = pygame.image.load(path).convert_alpha()
+            self.item_images.append(item)
 
     def current_item_box(self,left,top, size):
         if size == 0:
@@ -36,10 +41,17 @@ class UI():
 
     def weapon_overlay(self, weapon_index):
         bg_rect = self.current_item_box(40,840, 0)
-        weapon_surface = pygame.transform.scale(self.weapon_images[weapon_index], (64,128))
+        weapon_surface = pygame.transform.scale(self.weapon_images[weapon_index], (80,160))
         weapon_rect = weapon_surface.get_rect(center = bg_rect.center)
         
         self.display_surface.blit(weapon_surface, weapon_rect)
+
+    def item_overlay(self, item_index):
+        bg_rect = self.current_item_box(170,845,64)
+        item_surface = pygame.transform.scale(self.item_images[item_index], (56,56))
+        item_rect = item_surface.get_rect(center = bg_rect.center)
+        
+        self.display_surface.blit(item_surface, item_rect)
 
     # Change to convert into cooldown bar - call within cooldown function in player and 
     # pass in parameters from there (only appears when cooldown is needed)
@@ -68,5 +80,5 @@ class UI():
 
     def display(self, player, wave):
         self.weapon_overlay(player.weapon_index) #Current weapon
-        self.current_item_box(170,845,64) #Current health/healing item
+        self.item_overlay(player.item_index) #health/healing item
         self.wave_indicator_box(wave)

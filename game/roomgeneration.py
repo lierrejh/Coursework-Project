@@ -163,9 +163,6 @@ def bresenham(p1: Tuple[int, int], p2: Tuple[int, int]) -> List[Tuple[int, int]]
     path.append([x, y])
     return path
 
-
-
-
 def expand_path(path: List[Tuple[int, int]], radius: int) -> List[Tuple[int, int]]:
     expanded_path = []
     for point in path:
@@ -201,6 +198,8 @@ def room_generation():
     # Return converted points to map scale
     return get_converted_points(room_center_points)
     
-
+def get_player_spawn(points):
+        random_spawn_index = random.randint(0,len(points) -1)
+        return points[random_spawn_index]
 
     

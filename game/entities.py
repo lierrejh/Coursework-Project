@@ -1,5 +1,5 @@
 import pygame
-
+from math import cos
 class Entities(pygame.sprite.Sprite):
     def __init__(self, groups):
         super().__init__(groups)
@@ -7,6 +7,7 @@ class Entities(pygame.sprite.Sprite):
     def move(self, collision_list, speed):
         if self.direction.magnitude() != 0:
             self.direction = self.direction.normalize()
+
 
             #Horizontal movement
             self.position.x += self.direction.x * self.speed
@@ -36,7 +37,6 @@ class Entities(pygame.sprite.Sprite):
     def check_collisions_x(self, collision_list):
         collisions = self.get_hits(collision_list)
         for tile in collisions:
-            print("coll")
             if self.direction.x > 0: #Moving right
                 self.hitbox.right = tile.rect.left
                 self.position.x = self.rect.centerx

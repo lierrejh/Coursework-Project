@@ -5,7 +5,7 @@ import pygame
 import os
 import buttoncontrol
 import settings
-from roomgeneration import room_generation
+from roomgeneration import room_generation, get_player_spawn
 import random
 
 # initialise pygame and screen
@@ -31,9 +31,9 @@ class MainMenu:
         self.screen = screen
         self.state = "main"
 
-    def get_player_spawn(points):
-        random_spawn_index = random.randint(0,len(points) -1)
-        return points[random_spawn_index]
+    # def get_player_spawn(points):
+    #     random_spawn_index = random.randint(0,len(points) -1)
+    #     return points[random_spawn_index]
     
     def run(self):
 
@@ -45,8 +45,10 @@ class MainMenu:
             # menu settings for initial menu
             if self.state == "main":
                 if start_button.draw(self.screen):
+                    room_center_points = None
+                    spawn_point = None
                     room_center_points = room_generation()
-                    spawn_point = MainMenu.get_player_spawn(room_center_points)
+                    spawn_point = get_player_spawn(room_center_points)
                     room_center_points.remove(spawn_point)
                     
                     # strange import location due to preventing circular imports
@@ -113,8 +115,8 @@ class OptionsMenu:
                 if options_button.draw(self.screen):
                     self.state = "options"
                 if quit_button.draw(self.screen):
-                    mainMenu = MainMenu(self.screen)
-                    mainMenu.run()
+                    main_menu = MainMenu(self.screen)
+                    main_menu.run()
 
             elif self.state == "options":  # menu settings within options
                 if video_button.draw(self.screen):

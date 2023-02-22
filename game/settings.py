@@ -21,11 +21,16 @@ WEAPON_DATA = {
     "platinum-sword" : {'cooldown' : 800, 'damage' : 40, 'image' : 'assets/sprites+items/weapons/platinum-sword.png' },
     "gem-platinum-sword" : {'cooldown' : 750, 'damage' : 50, 'image' : 'assets/sprites+items/weapons/gem-platinum-sword.png' },
     "moonlight-sword" : {'cooldown' : 800, 'damage' : 60, 'image' : 'assets/sprites+items/weapons/moonlight-sword.png' },
+}
 
+ITEM_DATA = {
+    "small-health-potion" : {'health' : 80, 'image' : 'assets/sprites+items/items/small-healing-potion.png' },
+    "health-potion" : {'health' : 250, 'image' : 'assets/sprites+items/items/healing-potion.png' },
+    "damage-potion" : {'damage_increase' : 2, 'image' : 'assets/sprites+items/items/damage-potion.png' }
 }
 
 ENEMY_DATA = {
-    'goblin' : {'health' : 100, 'exp' : 50, 'damage' : 30, 'image' : 'assets/sprites+items/individual_sprites/0x72_16x16DungeonTileset-162.png', 'speed' : 2, 'resistance' : 3, 'attack_radius' : 50, 'notice_radius' : 300 },
-    'fire-demon' : {'health' : 200, 'exp' : 110, 'damage' : 50, 'image' : 'assets/sprites+items/individual_sprites/0x72_16x16DungeonTileset-178.png', 'speed' : 3, 'restitance' : 2, 'attack_radius' : 20, 'notice_radius' : 420 },
-    'mage' : {'health' : 300, 'exp' : 180, 'damage' : 40, 'image' : 'assets/sprites+items/individual_sprites/0x72_16x16DungeonTileset-149.png', 'speed' : 2, 'restitance' : 1, 'attack_radius' : 60, 'notice_radius' : 400 }
+    'goblin' : {'health' : 100, 'exp' : 50, 'damage' : 150, 'image' : 'assets/sprites+items/individual_sprites/0x72_16x16DungeonTileset-162.png', 'speed' : 2, 'resistance' : 3, 'attack_radius' : 40, 'notice_radius' : 250, 'attack_type' : 'slash' },
+    'fire-demon' : {'health' : 150, 'exp' : 110, 'damage' : 250, 'image' : 'assets/sprites+items/individual_sprites/0x72_16x16DungeonTileset-178.png', 'speed' : 3, 'resistance' : 2, 'attack_radius' : 30, 'notice_radius' : 350, 'attack_type' : 'fire' },
+    'mage' : {'health' : 200, 'exp' : 180, 'damage' : 200, 'image' : 'assets/sprites+items/individual_sprites/0x72_16x16DungeonTileset-149.png', 'speed' : 2, 'resistance' : 1, 'attack_radius' : 50, 'notice_radius' : 300, 'attack_type' : 'magic' }
 }
