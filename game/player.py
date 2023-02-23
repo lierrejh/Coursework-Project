@@ -41,7 +41,7 @@ class Player(Entities): # Character class
         self.health_bar_length = 600
         self.health_ratio = self.maximum_health / self.health_bar_length
         self.target_health = 1000
-        self.health_change_speed = 5
+        self.health_change_speed = 10
         self.vulnerable = True
         self.hit_time = None
         self.invulnerability_duration = 500

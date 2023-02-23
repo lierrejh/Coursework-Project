@@ -14,10 +14,10 @@ from settings import *
 from enemies import Enemies
 import random
 from particles import ParticleObjects
+import time
 
 pygame.font.init()
 pygame.init()
-map = Tilemap('assets/map/MapTest2.csv', tilesheet)
 FPS = 60
 clock = pygame.time.Clock()
 
@@ -29,21 +29,25 @@ tilesheet = Tilesheet('assets/sprites+items/0x72_16x16DungeonTileset.v4.png', 16
 class Game:
     
     def __init__(self, screen, spawn_point, room_coords):
+        self.map = Tilemap('assets/map/MapTest2.csv', tilesheet)
         self.clock = pygame.time.Clock()
         self.bg_colour = pygame.Color('black')
-        self.tile_wall, self.collision_list = map.tile_wall, map.collision_list
+        self.tile_wall, self.collision_list = self.map.tile_wall, self.map.collision_list
         
 
         self.resumeButton = pygame.image.load("assets/buttons/Resume_Button.png").convert_alpha()
+        self.game_over_screen = pygame.image.load("assets/mainmenu/game_over.jpg").convert_alpha()
         self.tiles = Tilesheet('assets/sprites+items/0x72_16x16DungeonTileset.v4.png', 16, 16, 16, 16)
         self.screen = screen
         self.visible_sprites = YSortCamera()
         self.damageable_sprites = pygame.sprite.Group()
         self.non_damageable_sprites = pygame.sprite.Group()
 
-
+        print("game instantiated", spawn_point)
+        print(room_coords)
         self.y, self.x = spawn_point[0], spawn_point[1]
         self.tile_size = 16
+        print(self.x, self.y)
         self.user = Player(self,self.x, self.y, [self.visible_sprites], self.create_attack, self.remove_attack, self.tile_wall, self.collision_list)
         self.UI = UI()
         self.current_attack = None
@@ -52,7 +56,6 @@ class Game:
         self.coords = room_coords
 
         self.ParticleObjects = ParticleObjects()
-        self.screen = screen
 
     def create_wave(self):
         enemies = []
@@ -134,13 +137,24 @@ class Game:
     def restore(self):
         self.y, self.x = None, None
         self.coords = None
+        
+        self.screen.blit(self.game_over_screen, (0,0))
+        self.font = pygame.font.Font('assets/fonts/Fipps-Regular.otf', 80)
+        text_surface = self.font.render("Game over", False, (100,0,0))
+        x = 1200 #Top right
+        y = 600
+        text_rect = text_surface.get_rect(bottomright = (x,y))
+        self.screen.blit(text_surface, text_rect) 
+        pygame.display.flip()
+        time.sleep(5)
+
         main_menu = MainMenu()
         main_menu.run()
 
     def draw_window(self, wave):
         self.screen.fill(self.bg_colour)
         # self.tiles.draw(self.screen) for identifying tiles
-        map.draw_map(self.screen)
+        self.map.draw_map(self.screen)
 
         # Camera
         self.visible_sprites.custom_draw(self.user)
@@ -169,7 +183,7 @@ class YSortCamera(pygame.sprite.Group): #Camera system
         self.ground_surf = self.screen
 
         self.ground_rect = self.ground_surf.get_rect(topleft = (0,0))    
-    
+
     def center_target(self, target):
         self.offset.x = target.rect.centerx - self.half_w
         self.offset.y = target.rect.centery - self.half_h
@@ -184,7 +198,7 @@ class YSortCamera(pygame.sprite.Group): #Camera system
             offset_pos = sprite.rect.topleft - self.offset
             self.screen.blit(pygame.transform.scale(sprite.image , (50,50)), offset_pos)
             #self.screen.blit(sprite.image , offset_pos)
- 
+
     def enemy_update(self, player):
         enemy_sprites = [sprite for sprite in self.sprites() if hasattr(sprite, 'sprite_type') and sprite.sprite_type == 'enemy']
         for enemy in enemy_sprites:
