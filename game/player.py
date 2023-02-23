@@ -44,7 +44,7 @@ class Player(Entities): # Character class
         self.health_change_speed = 10
         self.vulnerable = True
         self.hit_time = None
-        self.invulnerability_duration = 500
+        self.invulnerability_duration = 1000
         self.dead = False
 
         # Weapon Sysem

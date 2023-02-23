@@ -58,8 +58,6 @@ class Enemies(Entities):
         for animation in self.animations.keys():
             self.animations[animation] = aid.import_folder(main_path + animation)
 
-    
-
     def cooldown(self):
         current_time = pygame.time.get_ticks()
         if not self.can_attack:

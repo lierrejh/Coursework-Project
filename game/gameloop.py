@@ -39,6 +39,7 @@ class Game:
         self.game_over_screen = pygame.image.load("assets/mainmenu/game_over.jpg").convert_alpha()
         self.tiles = Tilesheet('assets/sprites+items/0x72_16x16DungeonTileset.v4.png', 16, 16, 16, 16)
         self.screen = screen
+        self.font = pygame.font.Font('assets/fonts/Fipps-Regular.otf', 80)
         self.visible_sprites = YSortCamera()
         self.damageable_sprites = pygame.sprite.Group()
         self.non_damageable_sprites = pygame.sprite.Group()
@@ -125,8 +126,6 @@ class Game:
                         attack_type = 'blood'
                         self.ParticleObjects.create_particles(attack_type, sprite.rect.center, [self.visible_sprites])
 
-
-
     def enemy_attacking_player(self, amount, attack_type):
         if self.user.vulnerable:
             self.user.get_damage(amount)
@@ -135,13 +134,14 @@ class Game:
             self.ParticleObjects.create_particles(attack_type, self.user.rect.center, [self.visible_sprites])
 
     def restore(self):
+        # Reset player/game variables
         self.y, self.x = None, None
         self.coords = None
         
+        # Game over screen
         self.screen.blit(self.game_over_screen, (0,0))
-        self.font = pygame.font.Font('assets/fonts/Fipps-Regular.otf', 80)
         text_surface = self.font.render("Game over", False, (100,0,0))
-        x = 1200 #Top right
+        x = 1100 #Top right
         y = 600
         text_rect = text_surface.get_rect(bottomright = (x,y))
         self.screen.blit(text_surface, text_rect) 
@@ -166,8 +166,7 @@ class Game:
         # Displaying UI        
         self.user.display_PlayerUI(self.user)
         self.UI.display(self.user, wave)
-
-        # self.visible_sprites.update(self.enemy, map.collision_list)
+        
         pygame.display.flip()
 
 
