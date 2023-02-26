@@ -1,7 +1,6 @@
 import pygame
 from entities import Entities
-from settings import *
-import aid
+import settings
 
 class Enemies(Entities):
     def __init__(self, game, enemy_type, coords, groups, collision_list, enemy_attacking_player):
@@ -31,7 +30,7 @@ class Enemies(Entities):
 
         # Stats
         self.enemy_type = enemy_type
-        enemy_info = ENEMY_DATA[self.enemy_type]
+        enemy_info = settings.ENEMY_DATA[self.enemy_type]
         self.health = enemy_info['health']
         self.exp = enemy_info["exp"]
         self.speed = enemy_info["speed"]
@@ -52,11 +51,13 @@ class Enemies(Entities):
         self.hit_time = None
         self.invincibility_duration = 300
 
+        # Scoring
+
     def import_animations(self,name):
         self.animations = {'attack':[],'idle':[],'move':[]}
         main_path = f'assets/sprites+items/enemies/{name}/'
         for animation in self.animations.keys():
-            self.animations[animation] = aid.import_folder(main_path + animation)
+            self.animations[animation] = settings.import_folder(main_path + animation)
 
     def cooldown(self):
         current_time = pygame.time.get_ticks()
@@ -79,7 +80,6 @@ class Enemies(Entities):
 
         self.hit_time = pygame.time.get_ticks()
         self.vulnerable = False
-
     
     def get_player_direction(self, player):
         enemy_vector = pygame.math.Vector2(self.rect.center)
@@ -96,7 +96,8 @@ class Enemies(Entities):
     def check_for_death(self):
         if self.health <= 0:
             self.kill()
-   
+            settings.enemies_killed += 1
+  
     def get_status(self, player):
         distance = self.get_player_direction(player)[0]
         
@@ -135,7 +136,6 @@ class Enemies(Entities):
         self.move(self.collision_list, self.speed)
         self.animate()
         self.cooldown()
-
 
     def enemy_update(self, player):
         self.get_status(player)

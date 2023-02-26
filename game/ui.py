@@ -1,10 +1,14 @@
 import pygame
 import settings
+import time
 
 class UI():
     def __init__(self):
         self.display_surface = pygame.display.get_surface()
-        self.font = pygame.font.Font('assets/fonts/Fipps-Regular.otf', 45)
+        self.font = pygame.font.Font('assets/fonts/Fipps-Regular.otf', 48)
+        self.font_enlarged = pygame.font.Font('assets/fonts/Fipps-Regular.otf', 80)
+        self.game_over = pygame.image.load("assets/mainmenu/game_over.jpg").convert_alpha()
+
 
         #Weapon Images
         self.weapon_images = []
@@ -52,6 +56,26 @@ class UI():
         item_rect = item_surface.get_rect(center = bg_rect.center)
         
         self.display_surface.blit(item_surface, item_rect)
+
+    def game_over_screen(self):
+        self.display_surface.blit(self.game_over, (0,0))
+        
+        text_surface = self.font_enlarged.render("Game over", False, (100,0,0))
+        if settings.enemies_killed == 1:
+            x = 'enemy'
+        else:
+            x = 'enemies'
+        text_surface2 = self.font.render(f'You have killed {settings.enemies_killed} {x}', False, (100,0,0))
+        x = 1000 #Top right
+        y = 600
+        text_rect = text_surface.get_rect(bottomright = (x + 150,y))
+        text_rect2 = text_surface2.get_rect(bottomright = (x+300,y+300))
+
+
+        self.display_surface.blit(text_surface, text_rect)
+        self.display_surface.blit(text_surface2, text_rect2)  
+        pygame.display.flip()
+        time.sleep(5)
 
     # Change to convert into cooldown bar - call within cooldown function in player and 
     # pass in parameters from there (only appears when cooldown is needed)

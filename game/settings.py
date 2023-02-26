@@ -1,5 +1,8 @@
 # Description: This file contains all the settings for the game
 
+import pygame
+from os import walk
+
 # Key settings:
 SCREEN_WIDTH = 1600
 SCREEN_HEIGHT = 1000
@@ -30,7 +33,21 @@ ITEM_DATA = {
 }
 
 ENEMY_DATA = {
-    'goblin' : {'health' : 100, 'exp' : 50, 'damage' : 150, 'image' : 'assets/sprites+items/individual_sprites/0x72_16x16DungeonTileset-162.png', 'speed' : 2, 'resistance' : 3, 'attack_radius' : 40, 'notice_radius' : 250, 'attack_type' : 'slash' },
-    'fire-demon' : {'health' : 150, 'exp' : 110, 'damage' : 250, 'image' : 'assets/sprites+items/individual_sprites/0x72_16x16DungeonTileset-178.png', 'speed' : 3, 'resistance' : 2, 'attack_radius' : 30, 'notice_radius' : 350, 'attack_type' : 'fire' },
-    'mage' : {'health' : 200, 'exp' : 180, 'damage' : 200, 'image' : 'assets/sprites+items/individual_sprites/0x72_16x16DungeonTileset-149.png', 'speed' : 2, 'resistance' : 1, 'attack_radius' : 50, 'notice_radius' : 300, 'attack_type' : 'magic' }
+    'goblin' : {'health' : 100, 'exp' : 50, 'damage' : 150, 'image' : 'assets/sprites+items/individual_sprites/0x72_16x16DungeonTileset-162.png', 'speed' : 2, 'resistance' : 3, 'attack_radius' : 40, 'notice_radius' : 150, 'attack_type' : 'slash' },
+    'fire-demon' : {'health' : 150, 'exp' : 110, 'damage' : 200, 'image' : 'assets/sprites+items/individual_sprites/0x72_16x16DungeonTileset-178.png', 'speed' : 3, 'resistance' : 2, 'attack_radius' : 30, 'notice_radius' : 250, 'attack_type' : 'fire' },
+    'mage' : {'health' : 200, 'exp' : 180, 'damage' : 150, 'image' : 'assets/sprites+items/individual_sprites/0x72_16x16DungeonTileset-149.png', 'speed' : 2, 'resistance' : 1, 'attack_radius' : 50, 'notice_radius' : 200, 'attack_type' : 'magic' }
 }
+
+enemies_killed = 0
+
+def import_folder(path):
+        surface_list = []
+        for _,__,img_files in walk(path):
+            img_files.sort()
+            for image in img_files:
+                if not image.endswith('.DS_Store'):
+                    full_path = path + '/' + image
+                    image_surf = pygame.image.load(full_path).convert_alpha()
+                    surface_list.append(image_surf)
+
+            return surface_list

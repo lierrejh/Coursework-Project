@@ -1,2 +1,3 @@
-hello = [1,4,3]
-hello.remove(hello[2])
+list1 = [[3],[2]]
+list2 = []
+list2 = list(list1)

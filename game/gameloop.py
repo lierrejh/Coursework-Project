@@ -10,11 +10,10 @@ from player import Player
 from tiles import *
 from ui import UI
 from attack import Weapon
-from settings import *
+import settings
 from enemies import Enemies
 import random
 from particles import ParticleObjects
-import time
 
 pygame.font.init()
 pygame.init()
@@ -36,7 +35,6 @@ class Game:
         
 
         self.resumeButton = pygame.image.load("assets/buttons/Resume_Button.png").convert_alpha()
-        self.game_over_screen = pygame.image.load("assets/mainmenu/game_over.jpg").convert_alpha()
         self.tiles = Tilesheet('assets/sprites+items/0x72_16x16DungeonTileset.v4.png', 16, 16, 16, 16)
         self.screen = screen
         self.font = pygame.font.Font('assets/fonts/Fipps-Regular.otf', 80)
@@ -44,42 +42,62 @@ class Game:
         self.damageable_sprites = pygame.sprite.Group()
         self.non_damageable_sprites = pygame.sprite.Group()
 
-        print("game instantiated", spawn_point)
-        print(room_coords)
         self.y, self.x = spawn_point[0], spawn_point[1]
         self.tile_size = 16
-        print(self.x, self.y)
         self.user = Player(self,self.x, self.y, [self.visible_sprites], self.create_attack, self.remove_attack, self.tile_wall, self.collision_list)
         self.UI = UI()
         self.current_attack = None
         self.enemy = None
         self.spawn_point = spawn_point
         self.coords = room_coords
-
+        self.coords_removable = None
+        self.enemy_count = 0
+        self.wave = 0
+        
         self.ParticleObjects = ParticleObjects()
 
     def create_wave(self):
-        enemies = []
+        self.enemy_count = 0
+        self.wave += 1
+        print(self.coords_removable)
+        self.coords_removable = None
+        print("after none", self.coords_removable)
+        self.coords_removable = []
+        self.coords_removable.extend(self.coords)
+        # 7 rooms
         for i in range(1,7):
-            enemies.append(self.create_enemy())
-        # return enemies
+            self.create_room_enemies()
+
+            # Between 1 and 4 enemies per room
+            # Add enemies to room and increase enemy count every time an enemy is added
+            # Enemy count is used to determine when the wave is over
+
+            # Differentiate between starting wave and other waves?
+            # Starting wave has 1 enemy per room
+            # Other waves have 1-4 enemies per room -> coordinate system
+            # Other waves don't spawn enemies in the room you're in
+            # Enemy FX when spawning?
 
     def game_loop(self, screen):
         #menu variables
         self.screen = screen
         game_paused = False
+        total_waves = random.randint(1, 5)
         
         self.create_wave()
 
         run = True
-        wave = 0
         while run:
             self.dt = clock.tick(60) * .001 * FPS
-            self.draw_window(wave) #passes wave into UI - make wave system with enemies
+            self.draw_window(self.wave) #passes wave into UI - make wave system with enemies
 
             if self.user.dead:
                 run = False
                 self.restore()
+
+            # Boss implementation
+            if (settings.enemies_killed == self.enemy_count) and (self.wave < total_waves):
+                self.create_wave()
 
             if game_paused == True: #options menu
                 optionsMenu = OptionsMenu(self.screen)
@@ -110,11 +128,37 @@ class Game:
         if self.current_attack:
             self.current_attack.kill()
         self.current_attack = None
+        
+    def create_room_enemies(self):
+        room_index = random.randint(0, (len(self.coords_removable)-1))
+        old_coords = self.coords_removable[room_index]
 
-    def create_enemy(self):
-        index = random.randint(0, (len(self.coords)-1))
-        self.enemy = Enemies(self, 'fire-demon', self.coords[index], [self.visible_sprites, self.damageable_sprites], self.collision_list, self.enemy_attacking_player)
-        self.coords.remove(self.coords[index])
+        # 1-4 enemies per room
+        if self.wave == 1:
+            number_of_enemies = 2
+        else:
+            number_of_enemies = random.randint(2, 5)
+            # if number_of_enemies = 0, spawn a chest in the room maybe?
+
+        for i in range(1,number_of_enemies):
+            rand_x = random.randint(-100, 100)
+            rand_y = random.randint(-100, 100)
+            new_coords = [old_coords[0] + rand_x, old_coords[1] + rand_y]
+            self.create_enemy(new_coords)
+            self.enemy_count += 1
+        self.coords_removable.remove(self.coords_removable[room_index])
+
+    def create_enemy(self, coords):
+        enemy_value = random.randint(1,3)
+        if enemy_value == 1:
+            enemy_type = 'fire-demon'
+        elif enemy_value == 2:
+            enemy_type = 'goblin'
+        elif enemy_value == 3:
+            enemy_type = 'mage'
+
+        self.enemy = Enemies(self, enemy_type, coords, [self.visible_sprites, self.damageable_sprites], self.collision_list, self.enemy_attacking_player)
+
         
     def player_attacking_enemy(self):
         if self.non_damageable_sprites:
@@ -137,17 +181,11 @@ class Game:
         # Reset player/game variables
         self.y, self.x = None, None
         self.coords = None
-        
-        # Game over screen
-        self.screen.blit(self.game_over_screen, (0,0))
-        text_surface = self.font.render("Game over", False, (100,0,0))
-        x = 1100 #Top right
-        y = 600
-        text_rect = text_surface.get_rect(bottomright = (x,y))
-        self.screen.blit(text_surface, text_rect) 
-        pygame.display.flip()
-        time.sleep(5)
 
+        # Game over screen
+        self.UI.game_over_screen()
+
+        settings.enemies_killed = 0
         main_menu = MainMenu()
         main_menu.run()
 
@@ -168,7 +206,6 @@ class Game:
         self.UI.display(self.user, wave)
         
         pygame.display.flip()
-
 
 class YSortCamera(pygame.sprite.Group): #Camera system
     def __init__(self):

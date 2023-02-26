@@ -1,5 +1,5 @@
 import pygame 
-from aid import import_folder
+from settings import import_folder
 
 class ParticleObjects:
     def __init__(self):
