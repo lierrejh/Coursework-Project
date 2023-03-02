@@ -7,15 +7,19 @@ class Enemies(Entities):
         super().__init__(groups)
         self.collision_list = collision_list
         self.sprite_type = 'enemy'
-
+        self.enemy_type = enemy_type
         
         # Animation
         self.status = 'idle'
         self.frame_index = 0
         self.animation_speed = 0.15
         self.import_animations(enemy_type)
-        self.image = self.animations[self.status][self.frame_index]
-        self.image2 = self.animations[self.status][self.frame_index]
+        if enemy_type[-4::] == 'boss':
+            self.image = pygame.transform.scale(self.animations[self.status][self.frame_index], (100,100))
+            self.image2 = pygame.transform.scale(self.animations[self.status][self.frame_index], (100,100))
+        else:
+            self.image = self.animations[self.status][self.frame_index]
+            self.image2 = self.animations[self.status][self.frame_index]
         self.image_flipped = pygame.transform.flip(self.image, True, False)   
         self.left_facing = False
 
@@ -29,13 +33,12 @@ class Enemies(Entities):
         self.image_flipped = pygame.transform.flip(self.image, True, False)    
 
         # Stats
-        self.enemy_type = enemy_type
         enemy_info = settings.ENEMY_DATA[self.enemy_type]
         self.health = enemy_info['health']
         self.exp = enemy_info["exp"]
         self.speed = enemy_info["speed"]
         self.attack_damage = enemy_info['damage']
-        self.resistance = enemy_info['resistance']
+        self.knockback = enemy_info['knockback']
         self.attack_radius = enemy_info['attack_radius']
         self.notice_radius = enemy_info['notice_radius']
         self.attack_type = enemy_info['attack_type']
@@ -50,8 +53,6 @@ class Enemies(Entities):
         self.vulnerable = True
         self.hit_time = None
         self.invincibility_duration = 300
-
-        # Scoring
 
     def import_animations(self,name):
         self.animations = {'attack':[],'idle':[],'move':[]}
@@ -69,9 +70,9 @@ class Enemies(Entities):
             if current_time - self.hit_time >= self.invincibility_duration:
                 self.vulnerable = True
             
-    def knockback(self):
+    def get_knockback(self):
         if not self.vulnerable:
-            self.direction *= -5
+            self.direction *= -self.knockback
 
     def get_damage(self, player, amount):
         if self.vulnerable:
@@ -128,16 +129,22 @@ class Enemies(Entities):
                     self.can_attack = False
                 self.frame_index = 0
 
-            self.image = animation[int(self.frame_index)]
+            if self.enemy_type[-4::] == 'boss':
+                self.image = pygame.transform.scale(self.animations[self.status][int(self.frame_index)], (100,100))
+                self.image2 = pygame.transform.scale(self.animations[self.status][int(self.frame_index)], (100,100))
+            else:
+                self.image = self.animations[self.status][int(self.frame_index)]
+                self.image2 = self.animations[self.status][int(self.frame_index)]
             self.rect = self.image.get_rect(center = self.hitbox.center)
     
     def update(self):
-        self.knockback()
+        self.get_knockback()
         self.move(self.collision_list, self.speed)
         self.animate()
         self.cooldown()
 
     def enemy_update(self, player):
+
         self.get_status(player)
         self.actions(player)
         self.check_for_death()

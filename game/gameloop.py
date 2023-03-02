@@ -14,6 +14,7 @@ import settings
 from enemies import Enemies
 import random
 from particles import ParticleObjects
+import time
 
 pygame.font.init()
 pygame.init()
@@ -53,18 +54,18 @@ class Game:
         self.coords_removable = None
         self.enemy_count = 0
         self.wave = 0
+        self.wave_commencing = False
         
         self.ParticleObjects = ParticleObjects()
 
     def create_wave(self):
-        self.enemy_count = 0
+        self.wave_commencing = True
         self.wave += 1
-        print(self.coords_removable)
         self.coords_removable = None
-        print("after none", self.coords_removable)
         self.coords_removable = []
         self.coords_removable.extend(self.coords)
         # 7 rooms
+
         for i in range(1,7):
             self.create_room_enemies()
 
@@ -77,6 +78,18 @@ class Game:
             # Other waves have 1-4 enemies per room -> coordinate system
             # Other waves don't spawn enemies in the room you're in
             # Enemy FX when spawning?
+        self.wave_commencing = False
+
+    def create_boss_wave(self):
+        self.wave += 1
+        self.coords_removable = None
+        self.coords_removable = []
+        self.coords_removable.extend(self.coords)
+
+        room_index = random.randint(0, (len(self.coords_removable)-1))
+
+        self.create_boss(self.coords_removable[room_index])
+        self.coords_removable.remove(self.coords_removable[room_index])    
 
     def game_loop(self, screen):
         #menu variables
@@ -85,11 +98,13 @@ class Game:
         total_waves = random.randint(1, 5)
         
         self.create_wave()
-
+        
         run = True
         while run:
             self.dt = clock.tick(60) * .001 * FPS
-            self.draw_window(self.wave) #passes wave into UI - make wave system with enemies
+            self.draw_window(self.wave, screen) #passes wave into UI - make wave system with enemies
+
+            # self.UI.boss_round_indicator()
 
             if self.user.dead:
                 run = False
@@ -98,8 +113,12 @@ class Game:
             # Boss implementation
             if (settings.enemies_killed == self.enemy_count) and (self.wave < total_waves):
                 self.create_wave()
+            elif (settings.enemies_killed == self.enemy_count) and (self.wave == total_waves):
+                print("Boss round")
+                self.create_boss_wave()
 
             if game_paused == True: #options menu
+                print(self.enemy_count, settings.enemies_killed)
                 optionsMenu = OptionsMenu(self.screen)
                 game_paused = False
                 optionsMenu.run()
@@ -113,7 +132,6 @@ class Game:
                         game_paused = True
                     elif keys[pygame.K_f]: #testing wave system / remove later
                         pass
-                        # wave += 1
                 elif event.type == pygame.QUIT:
                     run = False
 
@@ -151,15 +169,25 @@ class Game:
     def create_enemy(self, coords):
         enemy_value = random.randint(1,3)
         if enemy_value == 1:
-            enemy_type = 'fire-demon'
+            enemy_type = 'demon-boss'
         elif enemy_value == 2:
-            enemy_type = 'goblin'
+            enemy_type = 'goblin-boss'
         elif enemy_value == 3:
             enemy_type = 'mage'
 
         self.enemy = Enemies(self, enemy_type, coords, [self.visible_sprites, self.damageable_sprites], self.collision_list, self.enemy_attacking_player)
+     
+    def create_boss(self, coords):
+        enemy_value = random.randint(1,3)
+        if enemy_value == 1:
+            enemy_type = 'demon-boss'
+        elif enemy_value == 2:
+            enemy_type = 'goblin-boss'
+        elif enemy_value == 3:
+            enemy_type = 'giant-boss'
 
-        
+        self.enemy = Enemies(self, enemy_type, coords, [self.visible_sprites, self.damageable_sprites], self.collision_list, self.enemy_attacking_player)
+
     def player_attacking_enemy(self):
         if self.non_damageable_sprites:
             for non_damageable_sprite in self.non_damageable_sprites:
@@ -189,7 +217,7 @@ class Game:
         main_menu = MainMenu()
         main_menu.run()
 
-    def draw_window(self, wave):
+    def draw_window(self, wave, screen):
         self.screen.fill(self.bg_colour)
         # self.tiles.draw(self.screen) for identifying tiles
         self.map.draw_map(self.screen)
@@ -200,10 +228,11 @@ class Game:
         self.visible_sprites.enemy_update(self.user)
         self.player_attacking_enemy()
 
-
         # Displaying UI        
         self.user.display_PlayerUI(self.user)
-        self.UI.display(self.user, wave)
+        self.UI.display(self.user, wave, self.enemy_count, settings.enemies_killed)
+        
+        # self.UI.boss_round_indicator()
         
         pygame.display.flip()
 
@@ -232,8 +261,10 @@ class YSortCamera(pygame.sprite.Group): #Camera system
 
         for sprite in sorted(self.sprites(), key = lambda sprite: sprite.rect.centery):
             offset_pos = sprite.rect.topleft - self.offset
-            self.screen.blit(pygame.transform.scale(sprite.image , (50,50)), offset_pos)
-            #self.screen.blit(sprite.image , offset_pos)
+            if (hasattr(sprite, 'sprite_type') and sprite.sprite_type == 'enemy') and (sprite.enemy_type[-4::] == 'boss'):
+                self.screen.blit(pygame.transform.scale(sprite.image , (120,120)), offset_pos)
+            else:
+                self.screen.blit(pygame.transform.scale(sprite.image , (50,50)), offset_pos)
 
     def enemy_update(self, player):
         enemy_sprites = [sprite for sprite in self.sprites() if hasattr(sprite, 'sprite_type') and sprite.sprite_type == 'enemy']

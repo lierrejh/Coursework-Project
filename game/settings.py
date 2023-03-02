@@ -33,9 +33,12 @@ ITEM_DATA = {
 }
 
 ENEMY_DATA = {
-    'goblin' : {'health' : 100, 'exp' : 50, 'damage' : 150, 'image' : 'assets/sprites+items/individual_sprites/0x72_16x16DungeonTileset-162.png', 'speed' : 2, 'resistance' : 3, 'attack_radius' : 40, 'notice_radius' : 150, 'attack_type' : 'slash' },
-    'fire-demon' : {'health' : 150, 'exp' : 110, 'damage' : 200, 'image' : 'assets/sprites+items/individual_sprites/0x72_16x16DungeonTileset-178.png', 'speed' : 3, 'resistance' : 2, 'attack_radius' : 30, 'notice_radius' : 250, 'attack_type' : 'fire' },
-    'mage' : {'health' : 200, 'exp' : 180, 'damage' : 150, 'image' : 'assets/sprites+items/individual_sprites/0x72_16x16DungeonTileset-149.png', 'speed' : 2, 'resistance' : 1, 'attack_radius' : 50, 'notice_radius' : 200, 'attack_type' : 'magic' }
+    'goblin' : {'health' : 100, 'exp' : 50, 'damage' : 150, 'image' : 'assets/sprites+items/individual_sprites/0x72_16x16DungeonTileset-162.png', 'speed' : 2, 'knockback' : 3, 'attack_radius' : 30, 'notice_radius' : 150, 'attack_type' : 'slash' },
+    'fire-demon' : {'health' : 150, 'exp' : 110, 'damage' : 200, 'image' : 'assets/sprites+items/individual_sprites/0x72_16x16DungeonTileset-178.png', 'speed' : 3, 'knockback' : 2, 'attack_radius' : 25, 'notice_radius' : 250, 'attack_type' : 'fire' },
+    'mage' : {'health' : 200, 'exp' : 180, 'damage' : 150, 'image' : 'assets/sprites+items/individual_sprites/0x72_16x16DungeonTileset-149.png', 'speed' : 2, 'knockback' : 1, 'attack_radius' : 40, 'notice_radius' : 200, 'attack_type' : 'magic' },
+    'giant-boss' : {'health' : 500, 'exp' : 750, 'damage' : 250, 'image' : 'assets/sprites+items/enemies/giant-boss/attack/0.png', 'speed' : 1, 'knockback' : 0, 'attack_radius' : 50, 'notice_radius' : 300, 'attack_type' : 'magic' },
+    'demon-boss' : {'health' : 500, 'exp' : 750, 'damage' : 250, 'image' : 'assets/sprites+items/enemies/demon-boss/attack/0.png', 'speed' : 1, 'knockback' : 0, 'attack_radius' : 50, 'notice_radius' : 300, 'attack_type' : 'magic' },
+    'goblin-boss' : {'health' : 500, 'exp' : 750, 'damage' : 250, 'image' : 'assets/sprites+items/enemies/goblin-boss/attack/0.png', 'speed' : 1, 'knockback' : 0, 'attack_radius' : 50, 'notice_radius' : 300, 'attack_type' : 'magic' }
 }
 
 enemies_killed = 0

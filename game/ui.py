@@ -5,6 +5,7 @@ import time
 class UI():
     def __init__(self):
         self.display_surface = pygame.display.get_surface()
+        self.font_minimised = pygame.font.Font('assets/fonts/Fipps-Regular.otf', 30)
         self.font = pygame.font.Font('assets/fonts/Fipps-Regular.otf', 48)
         self.font_enlarged = pygame.font.Font('assets/fonts/Fipps-Regular.otf', 80)
         self.game_over = pygame.image.load("assets/mainmenu/game_over.jpg").convert_alpha()
@@ -42,6 +43,15 @@ class UI():
         #pygame.draw.rect(self.display_surface, (0,100,0), text_rect.inflate (20,20))
         self.display_surface.blit(text_surface, text_rect) 
         #pygame.draw.rect (self.display_surface, (0,100,0), text_rect.inflate (20, 20))
+
+    def enemies_left_box(self, enemy_count, enemies_killed):
+        text_surface = self.font_minimised.render(f'Enemies left {enemy_count - enemies_killed}', False, (100,0,0))
+        x = self.display_surface.get_size()[0] - 120 #Top right
+        y = 180
+        text_rect = text_surface.get_rect(bottomright = (x,y))
+        
+        #pygame.draw.rect(self.display_surface, (0,100,0), text_rect.inflate (20,20))
+        self.display_surface.blit(text_surface, text_rect) 
 
     def weapon_overlay(self, weapon_index):
         bg_rect = self.current_item_box(40,840, 0)
@@ -102,7 +112,17 @@ class UI():
         pygame.draw.rect(self.display_surface, transition_color, transition_bar_rect)
         pygame.draw.rect(self.display_surface,(255, 255, 255),(50, 85, 400, 25),4)'''
 
-    def display(self, player, wave):
+    def display(self, player, wave, enemy_count, enemies_killed):
         self.weapon_overlay(player.weapon_index) #Current weapon
         self.item_overlay(player.item_index) #health/healing item
         self.wave_indicator_box(wave)
+        self.enemies_left_box(enemy_count, enemies_killed)
+        # self.new_wave_box()
+
+    def boss_round_indicator(self):
+        text_surface = self.font_minimised.render(f'New wave commencing', False, (255,255,255))
+        x = self.display_surface.get_size()[0] / 2#Top right
+        y = 400
+        text_rect = text_surface.get_rect(bottomright = (x,y))
+        
+        self.display_surface.blit(text_surface, text_rect) 
