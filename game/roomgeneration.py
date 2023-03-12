@@ -37,12 +37,7 @@ def create_blank_CSV():
         os.remove("assets/map/MapTest2.csv")
         create_blank_CSV()
 
-# Room generation algorithm
-    #BSP?
-    #Place room centers, scan list to find room centers and then expand by a range (to make room larger)
-    #Save location of room centers
-    #Djikstra's in between rooms centers to make paths
-
+# Sets the tiles which border nothing to be walls
 def border_tiles(file_path):
     with open(file_path, 'r') as file:
         reader = csv.reader(file)
@@ -61,7 +56,7 @@ def border_tiles(file_path):
                         border_tiles.append([i, j])
         return border_tiles
 
-
+# Expands the central points of rooms by a given value in order to create the actual room
 def room_expansion(points):
     tiles = []
     # Iterate through the points
@@ -76,6 +71,7 @@ def room_expansion(points):
                     tiles.append(list(tile))
     return tiles
 
+# Updates the CSV with the tiles generated
 def update_CSV(tiles, tile_type):
     a = csv.reader(open('assets/map/MapTest2.csv'))
     lines = list(a)
@@ -89,7 +85,7 @@ def update_CSV(tiles, tile_type):
         writer = csv.writer(open('assets/map/MapTest2.csv', 'w'))
         writer.writerows(lines)
 
-
+# Generates the central points of the rooms
 def central_points_generation():
     create_blank_CSV()
     room_center_points = []
@@ -116,9 +112,11 @@ def central_points_generation():
         # If the point is not too close, add it to the list
         if not too_close:
             room_center_points.append(list(point))
-    #print(room_center_points)
     return room_center_points
 
+# Typing allows for better understanding of what is going on and what is being returned
+# Removes overlapping points in order to prevent rooms and oto many paths from being 
+# generated on top of each other
 def remove_overlapping_points(path: List[List[int]]) -> List[List[int]]:
     unique_points = []
     for point in path:
@@ -126,6 +124,7 @@ def remove_overlapping_points(path: List[List[int]]) -> List[List[int]]:
             unique_points.append(point)
     return unique_points
 
+# Creates a path from a list of points using Bresenham's line algorithm
 def create_path(points: List[List[int]]) -> List[Tuple[int, int]]:
     points = [tuple(point) for point in points]
     path = [list(points[0])]
@@ -133,24 +132,37 @@ def create_path(points: List[List[int]]) -> List[Tuple[int, int]]:
         path += bresenham(points[i], points[i + 1])
     return path
 
+# Bresenham's line algorithm
 def bresenham(p1: Tuple[int, int], p2: Tuple[int, int]) -> List[Tuple[int, int]]:
+    # Start and end points
     x1, y1 = p1
     x2, y2 = p2
+    # List of points on the path is declared
     path = []
+    # Absolute value of the difference between the start and end points
     dx = abs(x2 - x1)
     dy = abs(y2 - y1)
     x, y = x1, y1
+    
+    # Variables are set to -1 or 1 depending on whether the line is moving left or right, 
+    # and up or down respectively.
     sx = -1 if x1 > x2 else 1
     sy = -1 if y1 > y2 else 1
+    
+    # If the line is moving more horizontally than vertically
     if dx > dy:
+        # The error is set to half the difference between the start and end points
         err = dx / 2.0
+        # While the line has not reached the end point
         while x != x2:
             path.append([x, y])
             err -= dy
+            # If the error is less than 0, the line moves up or down depending on the value of sy
             if err < 0:
                 y += sy
                 err += dx
             x += sx
+    
     else:
         err = dy / 2.0
         while y != y2:
@@ -163,6 +175,7 @@ def bresenham(p1: Tuple[int, int], p2: Tuple[int, int]) -> List[Tuple[int, int]]
     path.append([x, y])
     return path
 
+# Expands the path by a given radius in order to create a larger path
 def expand_path(path: List[Tuple[int, int]], radius: int) -> List[Tuple[int, int]]:
     expanded_path = []
     for point in path:
@@ -172,7 +185,7 @@ def expand_path(path: List[Tuple[int, int]], radius: int) -> List[Tuple[int, int
                 expanded_path.append([i, j])
     return expanded_path
 
-
+# Comverts the points to the map scale
 def get_converted_points(points):
     converted_points = []
     for i in points:
@@ -181,6 +194,7 @@ def get_converted_points(points):
         converted_points.append([x, y])
     return converted_points
 
+# Generates the rooms and paths and gives them to tiles required and updates the CSV
 def room_generation():
     FLOOR = 'Floor'
     WALL = 'Wall'
@@ -198,6 +212,7 @@ def room_generation():
     # Return converted points to map scale
     return get_converted_points(room_center_points)
     
+# Generates the spawn points for the player
 def get_player_spawn(points):
         random_spawn_index = random.randint(0,len(points) -1)
         return points[random_spawn_index]

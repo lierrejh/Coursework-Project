@@ -12,10 +12,12 @@ class Tilesheet:
                 rect = (tile_x * width , tile_y * height , width, height)
                 line.append(image.subsurface(rect))
     
+    # Gets the tile at the given x and y from the tilesheet
     def get_tile(self, x , y):
         tileNeeded = pygame.transform.scale(self.tile_table[x][y], (16,16))
         return tileNeeded
     
+    # Draws the tilesheet to the screen
     def draw(self, screen):
         for x, row in enumerate(self.tile_table):
             for y, tile in enumerate(row):

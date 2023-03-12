@@ -1,9 +1,9 @@
 import pygame
-from math import cos
 class Entities(pygame.sprite.Sprite):
     def __init__(self, groups):
         super().__init__(groups)
 
+    # Provides movement to all entities
     def move(self, collision_list, speed):
         if self.direction.magnitude() != 0:
             self.direction = self.direction.normalize()
@@ -26,7 +26,8 @@ class Entities(pygame.sprite.Sprite):
                 self.image = self.image_flipped
             else:
                 self.image = self.image2
-
+    
+    # Hits measures collisions detected (for wall collisions and enemy collisions with player)
     def get_hits(self, collision_list):
         hits = []
         for tile in collision_list:
@@ -34,6 +35,7 @@ class Entities(pygame.sprite.Sprite):
                 hits.append(tile)
         return hits
     
+    # Checks for collisions in the x direction
     def check_collisions_x(self, collision_list):
         collisions = self.get_hits(collision_list)
         for tile in collisions:
@@ -46,6 +48,7 @@ class Entities(pygame.sprite.Sprite):
             self.rect.centerx = self.hitbox.centerx
             self.position.x = self.rect.centerx
 
+    # Checks for collisions in the y direction
     def check_collisions_y(self, collision_list):
         collisions = self.get_hits(collision_list)
         for tile in collisions:

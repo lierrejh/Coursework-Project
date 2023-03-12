@@ -37,8 +37,8 @@ class Player(Entities): # Character class
         self.display_surface = pygame.display.get_surface()
         
         #Health System
-        self.current_health = 1000
         self.maximum_health = 1000 * settings.player_stats['health_multiplier']
+        self.current_health = self.maximum_health
         self.health_bar_length = 600
         self.health_ratio = self.maximum_health / self.health_bar_length
         self.target_health = 1000
@@ -60,10 +60,11 @@ class Player(Entities): # Character class
         self.attack_cooldown = 200
         self.remove_attack = remove_attack
 
-        # Set by ticks
+        # Timers
         self.switch_time = 0 
         self.attack_time = 0
     
+    # Updates the player with each frame
     def update(self):
         self.check_for_death()
         self.movement_inputs()
@@ -71,26 +72,31 @@ class Player(Entities): # Character class
         self.cooldowns()
         self.move(self.collision_list, 0)
 
+    # If the player has been attacked, set its damage to reduce to the level 
+    # or if its below 0, set it to 0
     def get_damage(self, amount):
         if self.target_health > 0:
-            self.target_health = max(self.target_health - (amount * (1 - settings.player_stats['defense'])), 0)
+            self.target_health = max(self.target_health - amount, 0)
         if self.target_health <= 0:
             self.target_health = 0
 
+    # If the player has been healed, set its health to increase to the level 
     def get_health(self, amount):
         if self.target_health < self.maximum_health:
             self.target_health = max(self.target_health + amount, 0)
         if self.target_health >= self.maximum_health:
             self.target_health = self.maximum_health
     
-    def advanced_health_bar(self):
+    def health_bar(self):
         transition_width = 0
         transition_color = (100,0,0)
 
+        # If the current health is less than the target health, increase the current health
         if self.current_health < self.target_health:
             self.current_health += self.health_change_speed
             transition_width = int((self.target_health - self.current_health)/self.health_ratio)
             transition_color = (0,100,0)
+        # If the current health is greater than the target health, decrease the current health
         if self.current_health > self.target_health:
             self.current_health -= self.health_change_speed
             transition_width = int((self.target_health - self.current_health) /self.health_ratio)
@@ -98,14 +104,19 @@ class Player(Entities): # Character class
 
         health_bar_rect = pygame.Rect(50,45,self.current_health/self.health_ratio, 25)
         transition_bar_rect = pygame.Rect(health_bar_rect.right, 45, transition_width, 25)
-
+        
+        # Drawing the health bar
         pygame.draw.rect(self.display_surface, (100, 0, 0) , health_bar_rect)
         pygame.draw.rect(self.display_surface, transition_color, transition_bar_rect)
         pygame.draw.rect(self.display_surface,(255,255,255),(50,45,self.health_bar_length,25),4)
 
+    # Displaying the health bar on the User's interface
     def display_PlayerUI(self, player):
-        self.advanced_health_bar()
+        self.health_bar()
 
+    # Moves the player in whichever direction the user has pressed
+    # If the player is moving right, the player's image is flipped to face right
+    # If the player is moving left, the player's image is flipped to face left
     def movement_inputs(self):
         keys = pygame.key.get_pressed()
         if keys[pygame.K_a]:
@@ -118,13 +129,12 @@ class Player(Entities): # Character class
             self.direction.x = 0
         if keys[pygame.K_w]:
             self.direction.y = -1
-            # self.get_health(100)
         elif keys[pygame.K_s]:
             self.direction.y = 1
-            # self.get_damage(100)
         else:
             self.direction.y = 0
 
+    # Gets inputs from the user which aren't movement related
     def misc_inputs(self, player):
         keys = pygame.key.get_pressed()
         current_time = pygame.time.get_ticks()
@@ -135,7 +145,6 @@ class Player(Entities): # Character class
             self.can_switch_weapons = False
             self.switch_time = pygame.time.get_ticks()
 			
-            # print(settings.PLAYER_ITEMS)
             if (self.item_index + 1) < len(settings.PLAYER_ITEMS):
                 self.item_index += 1
             else:
@@ -143,28 +152,32 @@ class Player(Entities): # Character class
 				
             self.item = settings.PLAYER_ITEMS[self.item_index]
 
+        # If the player has pressed F, and is not busy with another action, and the cooldown has finished, use the item
         if keys[pygame.K_f] and (not self.player_busy) and (self.can_switch_weapons) and (current_time - self.switch_time >= self.switch_duration_cooldown):
-            print(settings.PLAYER_ITEMS)
+            # Prevents simultaneous actions
             self.player_busy = True
             self.can_switch_weapons = False
             self.switch_time = pygame.time.get_ticks()
-            # print(player.item)
             # Use item
+            # Get health if the item is a health potion (amount is equivalent to the amount the item heals)
             if (self.item == 'health-potion') or (self.item == 'small-health-potion'):
                 player.get_health(settings.ITEM_DATA[str(self.item)]['health'])
                 if self.item == 'health-potion':
                     settings.PLAYER_ITEMS.remove(self.item)
+            # If the item is a damge potion, increase the player's damage multiplier
             elif self.item == 'damage-potion':
                 settings.PLAYER_ITEMS.remove(self.item)
                 settings.player_stats['damage_multiplier'] += 0.1
             
             self.item_index = 0
             self.item = settings.PLAYER_ITEMS[self.item_index]
-
+   
+   # Checks if the player is dead (health is 0)
     def check_for_death(self):
         if self.current_health <= 0:
             self.dead = True
     
+    # Checks the user's inputs for attacking
     def attack_inputs(self, collision_list):
         keys = pygame.key.get_pressed()
         current_time = pygame.time.get_ticks()
@@ -182,7 +195,6 @@ class Player(Entities): # Character class
 				
             self.weapon = settings.PLAYER_WEAPONS[self.weapon_index]
         
-        # Attack
         attack_duration_cooldown = settings.WEAPON_DATA.get(f'{self.weapon}').get('cooldown')
 
         colliding = False
@@ -192,6 +204,8 @@ class Player(Entities): # Character class
         else:
             colliding = False
 
+        # If the player has pressed space, and is not busy with another action, 
+        # and the cooldown has finished, attack in the direction the player is facing
         if keys[pygame.K_SPACE] and (not self.player_busy) and ((current_time - self.attack_time >= attack_duration_cooldown)) and not colliding:
             # Can not attack if player moving in a diagonal direction
             if self.direction in CARDINAL_DIRECTIONS: 
@@ -201,24 +215,27 @@ class Player(Entities): # Character class
         
         self.misc_inputs(self)
 
+    # Creates cooldowns between actions
     def cooldowns(self):
-        #UI.cooldown_bar(self)
         current_time = pygame.time.get_ticks()
         
+        # If the player's switching cooldown has finished, allow the player to switch weapons again
         if not self.can_switch_weapons:
                     if current_time - self.switch_time >= self.switch_duration_cooldown:
                         self.can_switch_weapons = True
 
-                        
+        # If the player's attack cooldown has finished, allow the player to attack again   
         if self.player_busy:
             if current_time - self.attack_time >= self.attack_cooldown:
                 self.player_busy = False
                 self.remove_attack()
         
+        # If the player's invulnerability cooldown has finished, allow the player to be hit again
         if not self.vulnerable:
             if current_time - self.hit_time >= self.invulnerability_duration:
                 self.vulnerable = True
 
+    # Gets the base damage for the weapon the player is currently using
     def get_total_weapon_damage(self):
         weapon_damage = settings.WEAPON_DATA[self.weapon]['damage']
         return weapon_damage

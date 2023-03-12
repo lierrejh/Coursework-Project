@@ -33,12 +33,13 @@ class Tilemap(pygame.sprite.Sprite):
     def draw_map(self, surface):
         surface.blit(self.map_surface, (0,0))
         
-
+    # Loads the tiles from the CSV file
     def load_map(self):
         for tile in self.tiles:
             tile.draw(self.map_surface) 
 
-    def read_csv(self, filename): #algorithm taken from Pygame Tile Based Game Tutorial: Tilemaps
+    # Reads the CSV file and returns a list of the data (tiles) inside
+    def read_csv(self, filename):
         map_list = []
         with open(os.path.join(filename)) as data:
             data = csv.reader(data, delimiter=',')
@@ -46,6 +47,8 @@ class Tilemap(pygame.sprite.Sprite):
                 map_list.append(list(row))
         return map_list
 
+    # Takes the data from the CSV file and creates a list of tile objects based off of their 
+    # corresponding value
     def load_tiles(self, filename):
         tiles = []
         tile_wall = []
@@ -78,7 +81,7 @@ class Tilemap(pygame.sprite.Sprite):
                 x += 1
             y += 1
         
-                
+        # Allows the tile walls to be collided with
         tile_wall = pygame.sprite.Group(tile_wall)
         collision_list = pygame.sprite.Group(collision_list)
         self.map_w, self.map_h = x * self.tile_size, y * self.tile_size
