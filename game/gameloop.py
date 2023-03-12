@@ -15,6 +15,7 @@ from enemies import Enemies
 import random
 from particles import ParticleObjects
 import time
+from roomgeneration import room_generation, get_player_spawn
 
 pygame.font.init()
 pygame.init()
@@ -52,11 +53,21 @@ class Game:
         self.spawn_point = spawn_point
         self.coords = room_coords
         self.coords_removable = None
+        self.boss_coords = None
         self.enemy_count = 0
         self.wave = 0
         self.wave_commencing = False
+        self.chest_spawned = False
         
         self.ParticleObjects = ParticleObjects()
+        
+        # Timers
+        self.end_of_round_time = 0
+        self.boss_round_commencing_time = 0
+        settings.current_time = None
+        self.boss_killed_time = 0
+        self.chest_spawned_time = 0
+        
 
     def create_wave(self):
         self.wave_commencing = True
@@ -95,43 +106,60 @@ class Game:
         #menu variables
         self.screen = screen
         game_paused = False
-        total_waves = random.randint(1, 5)
+        total_waves = 2 #random.randint(1, 5)
         
         self.create_wave()
-        
+
         run = True
         while run:
-            self.dt = clock.tick(60) * .001 * FPS
+            settings.current_time = time.time()
             self.draw_window(self.wave, screen) #passes wave into UI - make wave system with enemies
-
-            # self.UI.boss_round_indicator()
 
             if self.user.dead:
                 run = False
                 self.restore()
 
-            # Boss implementation
-            if (settings.enemies_killed == self.enemy_count) and (self.wave < total_waves):
-                self.create_wave()
+                # Boss wave implementation
+            
+            # Timers
+
+            # Announcement to boss wave coming up next
+            if (settings.enemies_killed + 2 == self.enemy_count) and (self.wave + 1 == total_waves):
+                self.boss_round_commencing_time = time.time()
+
+            # Announcement to new wave coming up    
+            elif (settings.enemies_killed + 2 == self.enemy_count) and (self.wave + 1 < total_waves):
+                self.end_of_round_time = time.time()
+            
             elif (settings.enemies_killed == self.enemy_count) and (self.wave == total_waves):
-                print("Boss round")
+                self.boss_killed_time = time.time()
+                if not self.chest_spawned:
+                    self.display_chest(self.boss_coords)
+                    self.chest_spawned = True
+                    self.chest_spawned_time = time.time()
+                
+            # Need to get when enemies are killed in order to spawn item power up box
+
+            if (settings.enemies_killed == self.enemy_count) and (self.wave < total_waves - 1):
+                self.create_wave()
+            elif (settings.enemies_killed == self.enemy_count) and (self.wave == total_waves - 1):
                 self.create_boss_wave()
 
-            if game_paused == True: #options menu
-                print(self.enemy_count, settings.enemies_killed)
+
+
+            # Options menu
+            if game_paused == True: 
                 optionsMenu = OptionsMenu(self.screen)
                 game_paused = False
                 optionsMenu.run()
                 
-            keys = pygame.key.get_pressed() #testing wave system
+            keys = pygame.key.get_pressed()
             for event in pygame.event.get():
                 if event.type == pygame.KEYDOWN:
                     if (event.key == pygame.K_ESCAPE) and (game_paused): #Unpause on escape if game is paused
                         game_paused = False
                     elif (event.key == pygame.K_ESCAPE) and (not game_paused): #Pause on escape
                         game_paused = True
-                    elif keys[pygame.K_f]: #testing wave system / remove later
-                        pass
                 elif event.type == pygame.QUIT:
                     run = False
 
@@ -169,9 +197,9 @@ class Game:
     def create_enemy(self, coords):
         enemy_value = random.randint(1,3)
         if enemy_value == 1:
-            enemy_type = 'demon-boss'
+            enemy_type = 'fire-demon'
         elif enemy_value == 2:
-            enemy_type = 'goblin-boss'
+            enemy_type = 'goblin'
         elif enemy_value == 3:
             enemy_type = 'mage'
 
@@ -187,6 +215,8 @@ class Game:
             enemy_type = 'giant-boss'
 
         self.enemy = Enemies(self, enemy_type, coords, [self.visible_sprites, self.damageable_sprites], self.collision_list, self.enemy_attacking_player)
+        self.enemy_count += 1
+        self.boss_coords = coords
 
     def player_attacking_enemy(self):
         if self.non_damageable_sprites:
@@ -194,7 +224,7 @@ class Game:
                 collision = pygame.sprite.spritecollide(non_damageable_sprite, self.damageable_sprites, False)
                 if collision:
                     for sprite in collision:
-                        sprite.get_damage(self.user, Player.get_total_weapon_damage(self.user))
+                        sprite.get_damage(self.user, Player.get_total_weapon_damage(self.user) * settings.player_stats['damage_multiplier'])
                         attack_type = 'blood'
                         self.ParticleObjects.create_particles(attack_type, sprite.rect.center, [self.visible_sprites])
 
@@ -217,9 +247,14 @@ class Game:
         main_menu = MainMenu()
         main_menu.run()
 
+    def display_chest(self, coords):
+        enemy_type = 'chest'
+        self.enemy = Enemies(self, enemy_type, coords, [self.visible_sprites, self.damageable_sprites], self.collision_list, self.enemy_attacking_player)
+
     def draw_window(self, wave, screen):
+        # print(settings.PLAYER_ITEMS, settings.PLAYER_POWER_UPS)
+        # print(settings.PLAYER_WEAPONS)
         self.screen.fill(self.bg_colour)
-        # self.tiles.draw(self.screen) for identifying tiles
         self.map.draw_map(self.screen)
 
         # Camera
@@ -232,8 +267,35 @@ class Game:
         self.user.display_PlayerUI(self.user)
         self.UI.display(self.user, wave, self.enemy_count, settings.enemies_killed)
         
-        # self.UI.boss_round_indicator()
+        # Display round commencing screen
+        if (settings.current_time - self.end_of_round_time) < 5:
+            self.UI.next_round_indicator()
         
+        # Display boss round commencing screen
+        if (settings.current_time - self.boss_round_commencing_time) < 5:
+            self.UI.boss_round_indicator()
+        
+        if self.chest_spawned:
+            self.visible_sprites.chest_update(settings.current_time)
+
+        # if settings.chest_items or rng -> current time & display the pop up for ~5 seconds
+        #  and add to players usable inventory
+        if (settings.current_time - settings.enemy_drop_item_time) < 5:
+            self.UI.item_loot_box(settings.PLAYER_ITEMS[-1::][0])
+        
+        if (settings.current_time - settings.enemy_drop_powerup_time) < 5:
+            # Display power up box
+            self.UI.power_up_box(settings.PLAYER_POWER_UPS[-1::][0])
+            # Apply power up
+            power = settings.PLAYER_POWER_UPS[0]
+            if power == 'speed-increase':
+                settings.player_stats['speed'] += settings.POWER_UP_DATA[power]['speed']
+            elif power == 'defense-increase':
+                settings.player_stats['defense'] += settings.POWER_UP_DATA[power]['defense']
+            elif power == 'damage-increase':
+                settings.player_stats['damage_multiplier'] += settings.POWER_UP_DATA[power]['damage']
+            else:
+                settings.player_stats['health_multiplier'] += settings.POWER_UP_DATA[power]['health']
         pygame.display.flip()
 
 class YSortCamera(pygame.sprite.Group): #Camera system
@@ -270,4 +332,9 @@ class YSortCamera(pygame.sprite.Group): #Camera system
         enemy_sprites = [sprite for sprite in self.sprites() if hasattr(sprite, 'sprite_type') and sprite.sprite_type == 'enemy']
         for enemy in enemy_sprites:
             enemy.enemy_update(player)
+
+    def chest_update(self, current_time):
+        chest_sprites = [sprite for sprite in self.sprites() if hasattr(sprite, 'sprite_type') and sprite.enemy_type == 'chest']
+        for chest in chest_sprites:
+            chest.chest_update(current_time)
 

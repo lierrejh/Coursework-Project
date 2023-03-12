@@ -14,12 +14,13 @@ CARDINAL_DIRECTIONS = [(0, -1), (1, 0), (0, 1), (-1, 0), (0, 0)]
 class Player(Entities): # Character class
     def __init__(self, game, x , y, group, create_attack, remove_attack, tile_wall, collision_list): # Organise init
         super().__init__(group)
+        # Basic game variables
         self.color = (250,0,0)
         self.screen = pygame.display.set_mode((settings.SCREEN_WIDTH, settings.SCREEN_HEIGHT))
         self.game = game
         self.left_pressed = False
         self.right_pressed = False
-        self.speed = 4
+        self.speed = settings.player_stats['speed']
         self.tile_wall, self.collision_list = tile_wall, collision_list
         self.image = pygame.image.load('assets/sprites+items/individual_sprites/StartingCharacter.png').convert_alpha()
         self.image2 = pygame.image.load('assets/sprites+items/individual_sprites/StartingCharacter.png').convert_alpha()
@@ -37,7 +38,7 @@ class Player(Entities): # Character class
         
         #Health System
         self.current_health = 1000
-        self.maximum_health = 1000
+        self.maximum_health = 1000 * settings.player_stats['health_multiplier']
         self.health_bar_length = 600
         self.health_ratio = self.maximum_health / self.health_bar_length
         self.target_health = 1000
@@ -52,17 +53,16 @@ class Player(Entities): # Character class
         self.item_index = 0
         self.player_busy = False
         self.can_switch_weapons = True
-        self.weapon = list(settings.WEAPON_DATA.keys())[self.weapon_index]
-        self.item = list(settings.ITEM_DATA.keys())[self.item_index]
+        self.weapon = settings.PLAYER_WEAPONS[self.weapon_index]
+        self.item = settings.PLAYER_ITEMS[self.item_index]
         self.switch_duration_cooldown = 1000
         self.create_attack = create_attack
         self.attack_cooldown = 200
-        
-            # Set by ticks
+        self.remove_attack = remove_attack
+
+        # Set by ticks
         self.switch_time = 0 
         self.attack_time = 0
-       
-        self.remove_attack = remove_attack
     
     def update(self):
         self.check_for_death()
@@ -70,16 +70,10 @@ class Player(Entities): # Character class
         self.attack_inputs(self.collision_list)
         self.cooldowns()
         self.move(self.collision_list, 0)
-        '''for tile in tileWall: #Testing wall boundary
-            pygame.draw.rect(
-                self.screen,self.color, tile)'''
-        
-        '''if self.direction.magnitude() != 0: #Normalising diagonl movement in order to not gain extra acceleartion
-            self.direction = self.direction.normalize()'''
 
     def get_damage(self, amount):
         if self.target_health > 0:
-            self.target_health = max(self.target_health - amount, 0)
+            self.target_health = max(self.target_health - (amount * (1 - settings.player_stats['defense'])), 0)
         if self.target_health <= 0:
             self.target_health = 0
 
@@ -141,20 +135,31 @@ class Player(Entities): # Character class
             self.can_switch_weapons = False
             self.switch_time = pygame.time.get_ticks()
 			
-            if self.item_index < len(list(settings.ITEM_DATA.keys())) - 1:
+            # print(settings.PLAYER_ITEMS)
+            if (self.item_index + 1) < len(settings.PLAYER_ITEMS):
                 self.item_index += 1
             else:
                 self.item_index = 0
 				
-            self.item = list(settings.ITEM_DATA.keys())[self.item_index]
+            self.item = settings.PLAYER_ITEMS[self.item_index]
 
         if keys[pygame.K_f] and (not self.player_busy) and (self.can_switch_weapons) and (current_time - self.switch_time >= self.switch_duration_cooldown):
+            print(settings.PLAYER_ITEMS)
             self.player_busy = True
             self.can_switch_weapons = False
             self.switch_time = pygame.time.get_ticks()
-
+            # print(player.item)
             # Use item
-            player.get_health(settings.ITEM_DATA[player.item]["health"])
+            if (self.item == 'health-potion') or (self.item == 'small-health-potion'):
+                player.get_health(settings.ITEM_DATA[str(self.item)]['health'])
+                if self.item == 'health-potion':
+                    settings.PLAYER_ITEMS.remove(self.item)
+            elif self.item == 'damage-potion':
+                settings.PLAYER_ITEMS.remove(self.item)
+                settings.player_stats['damage_multiplier'] += 0.1
+            
+            self.item_index = 0
+            self.item = settings.PLAYER_ITEMS[self.item_index]
 
     def check_for_death(self):
         if self.current_health <= 0:
@@ -170,12 +175,12 @@ class Player(Entities): # Character class
             self.can_switch_weapons = False
             self.switch_time = pygame.time.get_ticks()
 			
-            if self.weapon_index < len(list(settings.WEAPON_DATA.keys())) - 1:
+            if (self.weapon_index + 1) < len(settings.PLAYER_WEAPONS):
                 self.weapon_index += 1
             else:
                 self.weapon_index = 0
 				
-            self.weapon = list(settings.WEAPON_DATA.keys())[self.weapon_index]
+            self.weapon = settings.PLAYER_WEAPONS[self.weapon_index]
         
         # Attack
         attack_duration_cooldown = settings.WEAPON_DATA.get(f'{self.weapon}').get('cooldown')

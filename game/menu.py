@@ -51,7 +51,7 @@ class MainMenu:
                     spawn_point = get_player_spawn(room_center_points)
                     room_center_points.remove(spawn_point)
                     
-                    # strange import location due to preventing circular imports
+                    # preventing circular imports
                     from gameloop import Game
                     game = Game(self.screen, spawn_point, room_center_points)
                     game.game_loop(self.screen)

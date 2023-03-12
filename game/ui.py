@@ -10,18 +10,27 @@ class UI():
         self.font_enlarged = pygame.font.Font('assets/fonts/Fipps-Regular.otf', 80)
         self.game_over = pygame.image.load("assets/mainmenu/game_over.jpg").convert_alpha()
 
-
-        #Weapon Images
+        # Weapon Images
         self.weapon_images = []
         for weapon in settings.WEAPON_DATA.values():
             path = weapon['image']
             weapon = pygame.image.load(path).convert_alpha()
             self.weapon_images.append(weapon)
+       
+        
+        # Item images 
         self.item_images = []
         for item in settings.ITEM_DATA.values():
             path = item['image']
             item = pygame.image.load(path).convert_alpha()
             self.item_images.append(item)
+        
+        # Power up images
+        self.power_up_images = []
+        for item in settings.POWER_UP_DATA.values():
+            path = item['image']
+            item = pygame.image.load(path).convert_alpha()
+            self.power_up_images.append(item)
 
     def current_item_box(self,left,top, size):
         if size == 0:
@@ -34,15 +43,11 @@ class UI():
 
     def wave_indicator_box(self, wave):
         text_surface = self.font.render(str(int(wave)), False, (100,0,0))
-        #x = self.display_surface.get_size()[0] - 120 #Bottom right
-        #y = self.display_surface.get_size()[1] + 10 #
         x = self.display_surface.get_size()[0] - 120 #Top right
         y = 120
         text_rect = text_surface.get_rect(bottomright = (x,y))
         
-        #pygame.draw.rect(self.display_surface, (0,100,0), text_rect.inflate (20,20))
         self.display_surface.blit(text_surface, text_rect) 
-        #pygame.draw.rect (self.display_surface, (0,100,0), text_rect.inflate (20, 20))
 
     def enemies_left_box(self, enemy_count, enemies_killed):
         text_surface = self.font_minimised.render(f'Enemies left {enemy_count - enemies_killed}', False, (100,0,0))
@@ -53,18 +58,18 @@ class UI():
         #pygame.draw.rect(self.display_surface, (0,100,0), text_rect.inflate (20,20))
         self.display_surface.blit(text_surface, text_rect) 
 
-    def weapon_overlay(self, weapon_index):
+    def weapon_overlay(self, weapon):
         bg_rect = self.current_item_box(40,840, 0)
-        weapon_surface = pygame.transform.scale(self.weapon_images[weapon_index], (80,160))
+        weapon_surface = pygame.transform.scale(self.weapon_images[settings.WEAPON_DATA[weapon]['index']], (80,160))
         weapon_rect = weapon_surface.get_rect(center = bg_rect.center)
         
         self.display_surface.blit(weapon_surface, weapon_rect)
 
-    def item_overlay(self, item_index):
+    def item_overlay(self, item):
         bg_rect = self.current_item_box(170,845,64)
-        item_surface = pygame.transform.scale(self.item_images[item_index], (56,56))
+        item_surface = pygame.transform.scale(self.item_images[settings.ITEM_DATA[item]['index']], (56,56))
         item_rect = item_surface.get_rect(center = bg_rect.center)
-        
+                                                                                        
         self.display_surface.blit(item_surface, item_rect)
 
     def game_over_screen(self):
@@ -87,8 +92,6 @@ class UI():
         pygame.display.flip()
         time.sleep(5)
 
-    # Change to convert into cooldown bar - call within cooldown function in player and 
-    # pass in parameters from there (only appears when cooldown is needed)
     '''def cooldown_bar(self):
         self.current_cooldown = 1000
         self.maximum_cooldown = 1000
@@ -113,16 +116,35 @@ class UI():
         pygame.draw.rect(self.display_surface,(255, 255, 255),(50, 85, 400, 25),4)'''
 
     def display(self, player, wave, enemy_count, enemies_killed):
-        self.weapon_overlay(player.weapon_index) #Current weapon
-        self.item_overlay(player.item_index) #health/healing item
+        self.weapon_overlay(player.weapon) #Current weapon
+        self.item_overlay(player.item) #health/healing item
         self.wave_indicator_box(wave)
         self.enemies_left_box(enemy_count, enemies_killed)
-        # self.new_wave_box()
 
-    def boss_round_indicator(self):
-        text_surface = self.font_minimised.render(f'New wave commencing', False, (255,255,255))
+    def next_round_indicator(self):
+        text_surface = self.font_minimised.render(f'New wave commencing shortly', False, (255,255,255))
         x = self.display_surface.get_size()[0] / 2#Top right
         y = 400
         text_rect = text_surface.get_rect(bottomright = (x,y))
         
+        self.display_surface.blit(text_surface, text_rect)
+
+    def boss_round_indicator(self):
+        text_surface = self.font_minimised.render(f'Boss wave incoming', False, (255,255,255))
+        x = self.display_surface.get_size()[0] / 2
+        y = 400
+        text_rect = text_surface.get_rect(bottomright = (x,y))
+        
         self.display_surface.blit(text_surface, text_rect) 
+
+    def power_up_box(self, power_up):
+        bg_rect = self.current_item_box(40,100, 64)
+        power_surface = pygame.transform.scale(self.power_up_images[settings.POWER_UP_DATA[power_up]['index']], (64,64))
+        power_rect = power_surface.get_rect(center = bg_rect.center)
+        self.display_surface.blit(power_surface, power_rect)
+    
+    def item_loot_box(self, item):
+        bg_rect = self.current_item_box(120,100, 64)
+        item_surface = pygame.transform.scale(self.item_images[int(settings.ITEM_DATA[item]['index'])], (64,64))
+        item_rect = item_surface.get_rect(center = bg_rect.center)
+        self.display_surface.blit(item_surface, item_rect)
