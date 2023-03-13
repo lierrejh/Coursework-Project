@@ -195,8 +195,8 @@ class Enemies(Entities):
     def drop_calculator(self):
         power_index = random.randint(0,2)
         item_index = random.randint(1,2)
-        settings.PLAYER_ITEMS.append(list(settings.ITEM_DATA.keys())[item_index])
-        settings.PLAYER_POWER_UPS.append(list(settings.POWER_UP_DATA.keys())[power_index])
+        settings.player_items.append(list(settings.ITEM_DATA.keys())[item_index])
+        settings.player_powerups.append(list(settings.POWER_UP_DATA.keys())[power_index])
        
         self.item_dropped()
         self.powerup_dropped()
@@ -209,19 +209,19 @@ class Enemies(Entities):
             
             weapon_value = random.randint(1,10) # 50 Percentage bracket
             if weapon_value < 5:
-                settings.PLAYER_WEAPONS.append(list(settings.WEAPON_DATA.keys())[weapon_value])
+                settings.player_weapons.append(list(settings.WEAPON_DATA.keys())[weapon_value])
             
             elif (weapon_value > 4) and (weapon_value <= 7): # 30 Percentage bracket
                 weapon_index = random.randint(1,4)
-                settings.PLAYER_WEAPONS.append(list(settings.WEAPON_DATA.keys())[weapon_index + 3])
+                settings.player_weapons.append(list(settings.WEAPON_DATA.keys())[weapon_index + 3])
             
             elif (weapon_value > 7) and (weapon_value <= 9): # 20 Percentage bracket
                 weapon_index = random.randint(1,4)
-                settings.PLAYER_WEAPONS.append(list(settings.WEAPON_DATA.keys())[weapon_index + 7])
+                settings.player_weapons.append(list(settings.WEAPON_DATA.keys())[weapon_index + 7])
             
             elif weapon_value == 10: # 10 Percentage bracket
                 weapon_index = random.randint(1,2)
-                settings.PLAYER_WEAPONS.append(list(settings.WEAPON_DATA.keys())[weapon_index + 11])
+                settings.player_weapons.append(list(settings.WEAPON_DATA.keys())[weapon_index + 11])
             
         # Guaranteed powerup or item
             self.drop_calculator()
@@ -233,9 +233,9 @@ class Enemies(Entities):
             value = random.randint(1,50)
             if (value <= 20) and (value >= 10):
                 if (value >= 10) and (value <= 17):
-                    settings.PLAYER_ITEMS.append(list(settings.ITEM_DATA.keys())[1])
+                    settings.player_items.append(list(settings.ITEM_DATA.keys())[1])
                 elif (value > 17) and (value <= 20):
-                    settings.PLAYER_ITEMS.append(list(settings.ITEM_DATA.keys())[2])
+                    settings.player_items.append(list(settings.ITEM_DATA.keys())[2])
                 self.item_dropped()
 
     def item_dropped(self):

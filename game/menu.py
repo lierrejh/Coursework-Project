@@ -58,9 +58,9 @@ class MainMenu:
                     settings.waves_completed = 0
                     settings.enemies_killed = 0
                     settings.level_count = 1
-                    settings.PLAYER_WEAPONS = ['wooden-sword']
-                    settings.PLAYER_ITEMS = ['small-health-potion']
-                    settings.PLAYER_POWER_UPS = []
+                    settings.player_weapons = ['wooden-sword']
+                    settings.player_items = ['small-health-potion']
+                    settings.player_powerups = []
                     settings.player_stats = {
                     'damage_multiplier' : 1,
                     'defense' : 1,

@@ -63,11 +63,11 @@ POWER_UP_DATA = {
     'speed-increase' : {'speed' : 1, 'image' : 'assets/sprites+items/icons/speed-increase.png', 'index' : 3},
 }
 
-PLAYER_WEAPONS = ['wooden-sword']
+player_weapons = ['wooden-sword']
 
-PLAYER_ITEMS = ['small-health-potion']
+player_items = ['small-health-potion']
 
-PLAYER_POWER_UPS = []
+player_powerups = []
 
 
 # Game variables

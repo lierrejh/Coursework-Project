@@ -53,8 +53,8 @@ class Player(Entities): # Character class
         self.item_index = 0
         self.player_busy = False
         self.can_switch_weapons = True
-        self.weapon = settings.PLAYER_WEAPONS[self.weapon_index]
-        self.item = settings.PLAYER_ITEMS[self.item_index]
+        self.weapon = settings.player_weapons[self.weapon_index]
+        self.item = settings.player_items[self.item_index]
         self.switch_duration_cooldown = 1000
         self.create_attack = create_attack
         self.attack_cooldown = 200
@@ -145,12 +145,12 @@ class Player(Entities): # Character class
             self.can_switch_weapons = False
             self.switch_time = pygame.time.get_ticks()
 			
-            if (self.item_index + 1) < len(settings.PLAYER_ITEMS):
+            if (self.item_index + 1) < len(settings.player_items):
                 self.item_index += 1
             else:
                 self.item_index = 0
 				
-            self.item = settings.PLAYER_ITEMS[self.item_index]
+            self.item = settings.player_items[self.item_index]
 
         # If the player has pressed F, and is not busy with another action, and the cooldown has finished, use the item
         if keys[pygame.K_f] and (not self.player_busy) and (self.can_switch_weapons) and (current_time - self.switch_time >= self.switch_duration_cooldown):
@@ -163,14 +163,14 @@ class Player(Entities): # Character class
             if (self.item == 'health-potion') or (self.item == 'small-health-potion'):
                 player.get_health(settings.ITEM_DATA[str(self.item)]['health'])
                 if self.item == 'health-potion':
-                    settings.PLAYER_ITEMS.remove(self.item)
+                    settings.player_items.remove(self.item)
             # If the item is a damge potion, increase the player's damage multiplier
             elif self.item == 'damage-potion':
-                settings.PLAYER_ITEMS.remove(self.item)
+                settings.player_items.remove(self.item)
                 settings.player_stats['damage_multiplier'] += 0.1
             
             self.item_index = 0
-            self.item = settings.PLAYER_ITEMS[self.item_index]
+            self.item = settings.player_items[self.item_index]
    
    # Checks if the player is dead (health is 0)
     def check_for_death(self):
@@ -188,12 +188,12 @@ class Player(Entities): # Character class
             self.can_switch_weapons = False
             self.switch_time = pygame.time.get_ticks()
 			
-            if (self.weapon_index + 1) < len(settings.PLAYER_WEAPONS):
+            if (self.weapon_index + 1) < len(settings.player_weapons):
                 self.weapon_index += 1
             else:
                 self.weapon_index = 0
 				
-            self.weapon = settings.PLAYER_WEAPONS[self.weapon_index]
+            self.weapon = settings.player_weapons[self.weapon_index]
         
         attack_duration_cooldown = settings.WEAPON_DATA.get(f'{self.weapon}').get('cooldown')
 

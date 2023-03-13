@@ -323,17 +323,17 @@ class Game:
         # If the player has picked up a powerup, display the powerup for 3 seconds
         if (settings.current_time - settings.enemy_drop_powerup_time) < 3:
             # Display power up box
-            x = settings.PLAYER_POWER_UPS[-1::][0]
+            x = settings.player_powerups[-1::][0]
             self.UI.power_up_box(x)
 
         # After 3 seconds, the powerup is popped from the players powerup list
         if (settings.current_time - settings.enemy_drop_powerup_time) == 3:
-            settings.PLAYER_POWER_UPS.pop()
+            settings.player_powerups.pop()
             
         # Uses the player's powerup if the player has one
-        if settings.PLAYER_POWER_UPS and not self.powerup_applied:
+        if settings.player_powerups and not self.powerup_applied:
             # Apply power up
-            power = settings.PLAYER_POWER_UPS[0]
+            power = settings.player_powerups[0]
             if power == 'speed-increase':
                 settings.player_stats['speed'] += settings.POWER_UP_DATA[power]['speed']
             elif power == 'defense-increase':
