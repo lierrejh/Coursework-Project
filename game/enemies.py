@@ -174,6 +174,10 @@ class Enemies(Entities):
     def update(self):
         if self.enemy_type != 'chest':
             self.get_knockback()
+            # Scaling movement speed with time ended up being too fast, so I just made it a constant
+            # Non-linear equation lead to speed being too fast 
+            # Linear equation lead to the same but just at a slower rate
+            # Cap on speed would have made the whole process irrelevant and added little to the game
             self.move(self.collision_list, self.speed)
         self.animate()
         self.cooldown()

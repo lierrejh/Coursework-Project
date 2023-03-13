@@ -12,7 +12,7 @@ player_stats = {
     'damage_multiplier' : 1,
     'defense' : 1,
     'health_multiplier' : 1,
-    'speed' : 8,
+    'speed' : 4,
 }
 
 # Weapon data:

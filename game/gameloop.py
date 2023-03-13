@@ -318,7 +318,7 @@ class Game:
 
         # If the player has picked up an item, display the item for 3 seconds
         if (settings.current_time - settings.enemy_drop_item_time) < 3:
-            self.UI.item_loot_box(settings.PLAYER_ITEMS[-1::][0])
+            self.UI.item_loot_box(settings.player_items[-1::][0])
         
         # If the player has picked up a powerup, display the powerup for 3 seconds
         if (settings.current_time - settings.enemy_drop_powerup_time) < 3:
