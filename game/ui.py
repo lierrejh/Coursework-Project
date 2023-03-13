@@ -91,30 +91,7 @@ class UI():
         self.display_surface.blit(text_surface2, text_rect2)  
         pygame.display.flip()
         time.sleep(5)
-
-    '''def cooldown_bar(self):
-        self.current_cooldown = 1000
-        self.maximum_cooldown = 1000
-        self.cooldown_bar_length = 400
-        self.cooldown_ratio = self.maximum_cooldown / self.cooldown_bar_length
-        self.target_cooldown = 1000
-        self.cooldown_change_speed = 5
-
-        transition_width = 0
-        transition_color = (0,250,0)
-
-        if self.current_cooldown > self.target_cooldown:
-            self.current_cooldown -= self.health_change_speed
-            transition_width = int((self.target_cooldown - self.current_cooldown) /self.cooldown_ratio)
-            transition_color = (0, 0, 255)   
-
-        cooldown_bar_rect = pygame.Rect(50, 85, 400, 25)
-        transition_bar_rect = pygame.Rect(cooldown_bar_rect.right, 45, transition_width, 25)
-
-        pygame.draw.rect(self.display_surface, (0, 0, 100) , cooldown_bar_rect)
-        pygame.draw.rect(self.display_surface, transition_color, transition_bar_rect)
-        pygame.draw.rect(self.display_surface,(255, 255, 255),(50, 85, 400, 25),4)'''
-
+    
     def display(self, player, wave, enemy_count, enemies_killed):
         self.weapon_overlay(player.weapon) #Current weapon
         self.item_overlay(player.item) #health/healing item

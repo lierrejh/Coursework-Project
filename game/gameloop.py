@@ -259,10 +259,6 @@ class Game:
 
     # Rests the player coordinates 
     def restore(self):
-        # Reset player/game variables
-        self.y, self.x = None, None
-        self.coords = None
-
         # Game over screen
         self.UI.game_over_screen()
 

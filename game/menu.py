@@ -50,6 +50,8 @@ class MainMenu:
                 if start_button.draw(self.screen):
                     # Restoring all values to default in order to prevent 
                     # old values from affecting new game
+                    self.y, self.x = None, None
+                    self.coords = None
                     room_center_points = None
                     spawn_point = None
                     room_center_points = room_generation()
@@ -150,8 +152,7 @@ class OptionsMenu:
                 if options_button.draw(self.screen):
                     self.state = "options"
                 if quit_button.draw(self.screen):
-                    main_menu = MainMenu(self.screen)
-                    main_menu.run()
+                    self.state = "quit"
 
             elif self.state == "options":  # menu settings within options
                 if audio_button.draw(self.screen):
@@ -169,6 +170,11 @@ class OptionsMenu:
                 if back_button.draw(self.screen):
                     self.state = "options"
 
+            elif self.state == "quit":
+                run = False
+                main_menu = MainMenu()
+                main_menu.run()
+                    
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     pygame.quit()
