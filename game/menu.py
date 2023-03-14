@@ -1,5 +1,3 @@
-# Finish settings
-
 from buttoncontrol import Button
 import pygame
 import os
@@ -67,7 +65,7 @@ class MainMenu:
                     'damage_multiplier' : 1,
                     'defense' : 1,
                     'health_multiplier' : 1,
-                    'speed' : 8,
+                    'speed' : 4,
                     }
                     
                     # preventing circular imports

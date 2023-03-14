@@ -1,5 +1,4 @@
 
-from tkinter import Y
 import pygame
 import buttoncontrol
 from menu import OptionsMenu, MainMenu
